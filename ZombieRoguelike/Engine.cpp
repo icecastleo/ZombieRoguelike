@@ -5,7 +5,7 @@
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
 screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
-	TCODConsole::initRoot(screenWidth, screenHeight, "libtcod C++ tutorial", false);
+	TCODConsole::initRoot(screenWidth, screenHeight, "Zombie Roguelike", false);
 	gui = new Gui();
 }
 
@@ -23,7 +23,7 @@ void Engine::init() {
 	map = new Map(80, 43);
 	map->init(true);
 	gui->message(TCODColor::red,
-		"Welcome stranger!\nPrepare to perish in the Tombs of the Ancient Kings.");
+		"Welcome stranger!\nPrepare to escape from endless zombies in the dungeons.");
 	gameStatus = STARTUP;
 }
 

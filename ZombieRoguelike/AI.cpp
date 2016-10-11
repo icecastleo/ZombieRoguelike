@@ -144,7 +144,9 @@ void PlayerAi::update(Actor *owner) {
 }
 
 bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
-	if (engine.map->isWall(targetx, targety)) return false;
+	if (engine.map->isWall(targetx, targety)) 
+		return false;
+	
 	// look for living actors to attack
 	for (Actor **iterator = engine.actors.begin();
 		iterator != engine.actors.end(); iterator++) {
@@ -168,6 +170,13 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 	}
 	owner->x = targetx;
 	owner->y = targety;
+		
+	// move to next level
+	if (engine.stairs->x == owner->x && engine.stairs->y == owner->y) {
+		engine.nextLevel();
+		return false;
+	}
+
 	return true;
 }
 
@@ -216,14 +225,14 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii) {
 		}
 	}
 	break;
-	case '>':
+	/*case '>':
 		if (engine.stairs->x == owner->x && engine.stairs->y == owner->y) {
 			engine.nextLevel();
 		}
 		else {
 			engine.gui->message(TCODColor::lightGrey, "There are no stairs here.");
 		}
-		break;
+		break;*/
 	}
 }
 
