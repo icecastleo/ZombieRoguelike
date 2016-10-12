@@ -109,6 +109,11 @@ void Gui::renderMouseLook() {
 				first = false;
 			}
 			strcat_s(buf, actor->name);
+			
+			if (actor->describer) {
+				strcat_s(buf, " : ");
+				strcat_s(buf, description(actor->describer, actor));
+			}
 		}
 	}
 	// display the list of actors under the mouse cursor

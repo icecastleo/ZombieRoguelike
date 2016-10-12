@@ -85,6 +85,7 @@ void Map::addMonster(int x, int y) {
 		// create an orc
 		Actor *zombie = new Actor(x, y, 'z', "zombie",
 			TCODColor::desaturatedGreen);
+		zombie->describer = new MonsterDescriber();
 		zombie->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
 		zombie->attacker = new Attacker(3);
 		zombie->ai = new MonsterAi();
@@ -94,6 +95,7 @@ void Map::addMonster(int x, int y) {
 		// create a troll
 		Actor *fleshy = new Actor(x, y, 'Z', "fleshy zombie ",
 			TCODColor::darkerGreen);
+		fleshy->describer = new MonsterDescriber();
 		fleshy->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
 		fleshy->attacker = new Attacker(4);
 		fleshy->ai = new MonsterAi();
