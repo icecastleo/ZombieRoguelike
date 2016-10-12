@@ -157,24 +157,45 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 			return false;
 		}
 	}
-	// look for corpses or items
-	for (Actor **iterator = engine.actors.begin();
-		iterator != engine.actors.end(); iterator++) {
-		Actor *actor = *iterator;
-		bool corpseOrItem = (actor->destructible && actor->destructible->isDead())
-			|| actor->pickable;
-		if (corpseOrItem
-			&& actor->x == targetx && actor->y == targety) {
-			engine.gui->message(TCODColor::lightGrey, "There's a %s here.", actor->name);
-		}
-	}
+
+	// nothing will block the player, move player
 	owner->x = targetx;
 	owner->y = targety;
-		
+
 	// move to next level
 	if (engine.stairs->x == owner->x && engine.stairs->y == owner->y) {
 		engine.nextLevel();
 		return false;
+	}
+
+	// look for corpses or items
+	for (Actor **iterator = engine.actors.begin();
+		iterator != engine.actors.end(); iterator++) {
+		Actor *actor = *iterator;
+
+		// check position
+		if (actor->x != targetx || actor->y != targety) {
+			continue;
+		}
+
+		if (actor->destructible && actor->destructible->isDead()) {
+			engine.gui->message(TCODColor::lightGrey, "There's a daed %s here.", actor->name);
+		} 
+		else if (actor->pickable) {
+			// pick up item
+			if (!actor->pickable->pick(actor, owner)) {
+				engine.gui->message(TCODColor::lightGrey, "Your package is full, cannot pick %s..", actor->name);
+			}
+		} 
+		else if (actor->usable) {
+			// use item
+			if (actor->usable->use(actor, owner)) {
+				engine.actors.remove(actor);
+			}
+			else {
+				engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->name);
+			}
+		}
 	}
 
 	return true;
@@ -191,37 +212,46 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii) {
 		}
 	}
 	break;
-	case 'g': // pickup item
-	{
-		bool found = false;
-		for (Actor **iterator = engine.actors.begin();
-			iterator != engine.actors.end(); iterator++) {
-			Actor *actor = *iterator;
-			if (actor->pickable && actor->x == owner->x && actor->y == owner->y) {
-				if (actor->pickable->pick(actor, owner)) {
-					found = true;
-					engine.gui->message(TCODColor::lightGrey, "You pick the %s.",
-						actor->name);
-					break;
-				}
-				else if (!found) {
-					found = true;
-					engine.gui->message(TCODColor::red, "Your inventory is full.");
-				}
-			}
-		}
-		if (!found) {
-			engine.gui->message(TCODColor::lightGrey, "There's nothing here that you can pick.");
-		}
-		engine.gameStatus = Engine::NEW_TURN;
-	}
-	break;
+	//case 'g': // pickup item
+	//{
+	//	bool found = false;
+	//	for (Actor **iterator = engine.actors.begin();
+	//		iterator != engine.actors.end(); iterator++) {
+	//		Actor *actor = *iterator;
+	//		if (actor->pickable && actor->x == owner->x && actor->y == owner->y) {
+	//			if (actor->pickable->pick(actor, owner)) {
+	//				found = true;
+	//				engine.gui->message(TCODColor::lightGrey, "You pick the %s.",
+	//					actor->name);
+	//				break;
+	//			}
+	//			else if (!found) {
+	//				found = true;
+	//				engine.gui->message(TCODColor::red, "Your inventory is full.");
+	//			}
+	//		}
+	//	}
+	//	if (!found) {
+	//		engine.gui->message(TCODColor::lightGrey, "There's nothing here that you can pick.");
+	//	}
+	//	engine.gameStatus = Engine::NEW_TURN;
+	//}
+	//break;
 	case 'i': // display inventory
 	{
 		Actor *actor = choseFromInventory(owner);
 		if (actor) {
-			actor->pickable->use(actor, owner);
-			engine.gameStatus = Engine::NEW_TURN;
+			if (actor->usable) {
+				actor->usable->use(actor, owner);
+				
+				// remove from inventory
+				owner->container->remove(actor);
+				delete actor;
+
+				engine.gameStatus = Engine::NEW_TURN;
+			} else {
+				engine.gui->message(TCODColor::red, "%s cannot be used..", actor->name);
+			}
 		}
 	}
 	break;

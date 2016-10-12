@@ -40,7 +40,7 @@ void Actor::load(TCODZip &zip) {
 		ai = Ai::create(zip);
 	}
 	if (hasPickable) {
-		pickable = Pickable::create(zip);
+		pickable = new Pickable();
 	}
 	if (hasContainer) {
 		container = new Container(0);
@@ -64,7 +64,7 @@ void Actor::save(TCODZip &zip) {
 	if (attacker) attacker->save(zip);
 	if (destructible) destructible->save(zip);
 	if (ai) ai->save(zip);
-	if (pickable) pickable->save(zip);
+	//if (pickable) pickable->save(zip);
 	if (container) container->save(zip);
 }
 
@@ -173,55 +173,55 @@ Ai *Ai::create(TCODZip &zip) {
 	return ai;
 }
 
-void Healer::load(TCODZip &zip) {
-	amount = zip.getFloat();
-}
+//void Healer::load(TCODZip &zip) {
+//	amount = zip.getFloat();
+//}
+//
+//void Healer::save(TCODZip &zip) {
+//	zip.putInt(HEALER);
+//	zip.putFloat(amount);
+//}
 
-void Healer::save(TCODZip &zip) {
-	zip.putInt(HEALER);
-	zip.putFloat(amount);
-}
-
-void LightningBolt::load(TCODZip &zip) {
-	range = zip.getFloat();
-	damage = zip.getFloat();
-}
-
-void LightningBolt::save(TCODZip &zip) {
-	zip.putInt(LIGHTNING_BOLT);
-	zip.putFloat(range);
-	zip.putFloat(damage);
-}
-
-void Confuser::load(TCODZip &zip) {
-	nbTurns = zip.getInt();
-	range = zip.getFloat();
-}
-
-void Confuser::save(TCODZip &zip) {
-	zip.putInt(CONFUSER);
-	zip.putInt(nbTurns);
-	zip.putFloat(range);
-}
-
-void Fireball::save(TCODZip &zip) {
-	zip.putInt(FIREBALL);
-	zip.putFloat(range);
-	zip.putFloat(damage);
-}
-
-Pickable *Pickable::create(TCODZip &zip) {
-	PickableType type = (PickableType)zip.getInt();
-	Pickable *pickable = NULL;
-	switch (type) {
-	case HEALER: pickable = new Healer(0); break;
-	case LIGHTNING_BOLT: pickable = new LightningBolt(0, 0); break;
-	case CONFUSER: pickable = new Confuser(0, 0); break;
-	case FIREBALL: pickable = new Fireball(0, 0); break;
-	}
-	pickable->load(zip);
-	return pickable;
-}
+//void LightningBolt::load(TCODZip &zip) {
+//	range = zip.getFloat();
+//	damage = zip.getFloat();
+//}
+//
+//void LightningBolt::save(TCODZip &zip) {
+//	zip.putInt(LIGHTNING_BOLT);
+//	zip.putFloat(range);
+//	zip.putFloat(damage);
+//}
+//
+//void Confuser::load(TCODZip &zip) {
+//	nbTurns = zip.getInt();
+//	range = zip.getFloat();
+//}
+//
+//void Confuser::save(TCODZip &zip) {
+//	zip.putInt(CONFUSER);
+//	zip.putInt(nbTurns);
+//	zip.putFloat(range);
+//}
+//
+//void Fireball::save(TCODZip &zip) {
+//	zip.putInt(FIREBALL);
+//	zip.putFloat(range);
+//	zip.putFloat(damage);
+//}
+//
+//Pickable *Pickable::create(TCODZip &zip) {
+//	PickableType type = (PickableType)zip.getInt();
+//	Pickable *pickable = NULL;
+//	switch (type) {
+//	//case HEALER: pickable = new Healer(0); break;
+//	case LIGHTNING_BOLT: pickable = new LightningBolt(0, 0); break;
+//	case CONFUSER: pickable = new Confuser(0, 0); break;
+//	case FIREBALL: pickable = new Fireball(0, 0); break;
+//	}
+//	pickable->load(zip);
+//	return pickable;
+//}
 
 void Gui::load(TCODZip &zip) {
 	int nbMessages = zip.getInt();

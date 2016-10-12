@@ -16,18 +16,23 @@ public:
 	bool visitNode(TCODBsp *node, void *userData) {
 		if (node->isLeaf()) {
 			int x, y, w, h;
-			// dig a room
-			bool withActors = (bool)userData;
+			
 			w = map.rng->getInt(ROOM_MIN_SIZE, node->w - 2);
 			h = map.rng->getInt(ROOM_MIN_SIZE, node->h - 2);
 			x = map.rng->getInt(node->x + 1, node->x + node->w - w - 1);
 			y = map.rng->getInt(node->y + 1, node->y + node->h - h - 1);
+
+			bool withActors = (bool)userData;
+			
+			// dig a room
 			map.createRoom(roomNum == 0, x, y, x + w - 1, y + h - 1, withActors);
+			
 			if (roomNum != 0) {
 				// dig a corridor from last room
 				map.dig(lastx, lasty, x + w / 2, lasty);
 				map.dig(x + w / 2, lasty, x + w / 2, y + h / 2);
 			}
+
 			lastx = x + w / 2;
 			lasty = y + h / 2;
 			roomNum++;
@@ -78,35 +83,44 @@ void Map::addMonster(int x, int y) {
 	TCODRandom *rng = TCODRandom::getInstance();
 	if (rng->getInt(0, 100) < 80) {
 		// create an orc
-		Actor *orc = new Actor(x, y, 'z', "zombie",
+		Actor *zombie = new Actor(x, y, 'z', "zombie",
 			TCODColor::desaturatedGreen);
-		orc->destructible = new MonsterDestructible(10, 0, "small zombie", 35);
-		orc->attacker = new Attacker(3);
-		orc->ai = new MonsterAi();
-		engine.actors.push(orc);
+		zombie->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
+		zombie->attacker = new Attacker(3);
+		zombie->ai = new MonsterAi();
+		engine.actors.push(zombie);
 	}
 	else {
 		// create a troll
-		Actor *troll = new Actor(x, y, 'Z', "crazy zombie ",
+		Actor *fleshy = new Actor(x, y, 'Z', "fleshy zombie ",
 			TCODColor::darkerGreen);
-		troll->destructible = new MonsterDestructible(16, 1, "crazy zombie", 100);
-		troll->attacker = new Attacker(4);
-		troll->ai = new MonsterAi();
-		engine.actors.push(troll);
+		fleshy->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
+		fleshy->attacker = new Attacker(4);
+		fleshy->ai = new MonsterAi();
+		engine.actors.push(fleshy);
 	}
 }
 
 void Map::addItem(int x, int y) {
 	TCODRandom *rng = TCODRandom::getInstance();
 	int dice = rng->getInt(0, 100);
-	if (dice < 70) {
+	if (dice < 50) {
 		// create a bread
+		Actor *rice = new Actor(x, y, '!', "rice",
+			TCODColor::violet);
+		rice->blocks = false;
+		rice->usable = new Healer(12);
+		engine.actors.push(rice);
+	}
+	else if (dice < 75) {
 		Actor *bread = new Actor(x, y, '!', "bread",
 			TCODColor::violet);
 		bread->blocks = false;
-		bread->pickable = new Healer(15);
+		bread->pickable = new Pickable();
+		bread->usable = new Healer(8);
 		engine.actors.push(bread);
 	}
+
 	//else if (dice < 70 + 10) {
 	//	// create a scroll of lightning bolt 
 	//	Actor *scrollOfLightningBolt = new Actor(x, y, '#', "scroll of lightning bolt",

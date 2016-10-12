@@ -12,6 +12,7 @@ public:
 	Destructible *destructible; // something that can be damaged
 	Ai *ai; // something self-updating
 	Pickable *pickable; // something that can be picked and used
+	Usable *usable; // something that can be used
 	Container *container; // something that can contain actors
 
 	Actor(int x, int y, int ch, const char *name, const TCODColor &col);
@@ -22,3 +23,6 @@ public:
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
 };
+
+
+

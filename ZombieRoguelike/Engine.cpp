@@ -20,6 +20,7 @@ void Engine::init() {
 	stairs->blocks = false;
 	stairs->fovOnly = false;
 	actors.push(stairs);
+
 	map = new Map(80, 43);
 	map->init(true);
 	gui->message(TCODColor::red,
@@ -39,14 +40,18 @@ void Engine::term() {
 }
 
 void Engine::update() {
-	if (gameStatus == STARTUP) map->computeFov();
+	if (gameStatus == STARTUP) 
+		map->computeFov();
+
 	gameStatus = IDLE;
+
 	TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
 	if (lastKey.vk == TCODK_ESCAPE) {
 		save();
 		load(true);
 	}
 	player->update();
+	
 	if (gameStatus == NEW_TURN) {
 		for (Actor **iterator = actors.begin(); iterator != actors.end();
 			iterator++) {
