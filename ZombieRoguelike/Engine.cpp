@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "main.h"
 #include <math.h>
-
+#include <iostream>
 
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
@@ -22,6 +22,8 @@ void Engine::init() {
 	stairs->blocks = false;
 	stairs->fovOnly = false;
 	actors.push(stairs);
+
+	std::cout << player;
 
 	map = new Map(80, 43);
 	map->init(true);
