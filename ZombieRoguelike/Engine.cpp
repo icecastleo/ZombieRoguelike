@@ -2,6 +2,7 @@
 #include "main.h"
 #include <math.h>
 
+
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
 screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
@@ -12,7 +13,7 @@ screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
 void Engine::init() {
 	player = new Actor(40, 25, '@', "player", TCODColor::white);
 	player->describer = new PlayerDescriber();
-	player->destructible = new PlayerDestructible(30, 2, "your cadaver");
+	player->destructible = new PlayerDestructible(healthPoints, 2, "your cadaver");
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
 	player->container = new Container(26);

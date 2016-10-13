@@ -16,5 +16,7 @@ class Actor;
 #include "Gui.h"
 #include "Engine.h"
 
+#define healthPoints 250
+
 //#define NDEBUG 
 #include <assert.h>

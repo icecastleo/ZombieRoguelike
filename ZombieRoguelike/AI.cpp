@@ -159,6 +159,7 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 	}
 
 	// nothing will block the player, move player
+	owner->destructible->takeDamage(owner, 3.0f);//Each move will take one health
 	owner->x = targetx;
 	owner->y = targety;
 
