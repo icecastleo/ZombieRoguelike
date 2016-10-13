@@ -13,7 +13,7 @@ screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
 void Engine::init() {
 	player = new Actor(40, 25, '@', "player", TCODColor::white);
 	player->describer = new PlayerDescriber();
-	player->destructible = new PlayerDestructible(healthPoints, 2, "your cadaver");
+	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
 	player->container = new Container(26);
@@ -25,6 +25,11 @@ void Engine::init() {
 
 	map = new Map(80, 43);
 	map->init(true);
+
+#ifdef _M_X64
+	engine.gui->message(TCODColor::yellow, "Hello player with x64 processors!!");
+#endif
+
 	gui->message(TCODColor::red,
 		"Welcome stranger!\nPrepare to escape from endless zombies in the dungeons.");
 	gameStatus = STARTUP;

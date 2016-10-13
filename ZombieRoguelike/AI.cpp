@@ -85,10 +85,6 @@ void ConfusedMonsterAi::update(Actor *owner) {
 PlayerAi::PlayerAi() : xpLevel(1) {
 }
 
-const int LEVEL_UP_BASE = 200;
-const int LEVEL_UP_FACTOR = 150;
-
-
 int PlayerAi::getNextLevelXp() {
 	return LEVEL_UP_BASE + xpLevel*LEVEL_UP_FACTOR;
 }
@@ -98,7 +94,9 @@ void PlayerAi::update(Actor *owner) {
 	if (owner->destructible->xp >= levelUpXp) {
 		xpLevel++;
 		owner->destructible->xp -= levelUpXp;
-		engine.gui->message(TCODColor::yellow, "Your battle skills grow stronger! You reached level %d", xpLevel);
+		owner->destructible->heal();
+		engine.gui->message(TCODColor::yellow, "You reached level %d! \nYou feel healthy and your battle skills grow stronger!", xpLevel);
+		
 		engine.gui->menu.clear();
 		engine.gui->menu.addItem(Menu::CONSTITUTION, "Constitution (+20HP)");
 		engine.gui->menu.addItem(Menu::STRENGTH, "Strength (+1 attack)");
@@ -159,9 +157,11 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 	}
 
 	// nothing will block the player, move player
-	owner->destructible->takeDamage(owner, 3.0f);//Each move will take one health
 	owner->x = targetx;
 	owner->y = targety;
+
+	// each move will take some health point
+	owner->destructible->takeDamage(owner, 1.0f);
 
 	// move to next level
 	if (engine.stairs->x == owner->x && engine.stairs->y == owner->y) {
@@ -194,7 +194,13 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 				engine.actors.remove(actor);
 			}
 			else {
-				engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->name);
+				Healer *healer = dynamic_cast<Healer *>(actor->usable);
+
+				if (healer) { // dynamic cast successfully
+					engine.gui->message(TCODColor::lightGrey, "Your hp is full!! You cannot eat %s right now!!", actor->name);
+				} else {
+					engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->name);
+				}
 			}
 		}
 	}

@@ -16,7 +16,9 @@ class Actor;
 #include "Gui.h"
 #include "Engine.h"
 
-#define healthPoints 250
+#define START_HP 100
+#define LEVEL_UP_BASE = 200;
+#define LEVEL_UP_FACTOR = 150;
 
 //#define NDEBUG 
 #include <assert.h>

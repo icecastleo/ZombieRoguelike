@@ -19,6 +19,13 @@ float Destructible::takeDamage(Actor *owner, float damage) {
 	return damage;
 }
 
+// heal to full health
+float Destructible::heal() {
+	float temp = maxHp - hp;
+	hp = maxHp;
+	return temp;
+}
+
 float Destructible::heal(float amount) {
 	hp += amount;
 	if (hp > maxHp) {
