@@ -196,17 +196,33 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 		TCODConsole::root->setDefaultForeground(TCODColor::lighterOrange);
 
 		// read title from file
-		string line;
-		ifstream myfile("title.txt");
-		if (myfile.is_open()) {
-			for (int i = 1; getline(myfile, line); i++) {
-				// print the title
-				TCODConsole::root->print(0, i, (line + "\n").c_str());
+		try
+		{
+			string line;
+			ifstream myfile("title.txt");
+			if (myfile.is_open()) {
+				for (int i = 1; getline(myfile, line); i++) {
+					// print the title
+					TCODConsole::root->print(0, i, (line + "\n").c_str());
+				}
+				myfile.close();
 			}
-			myfile.close();
-		} else {
-			cout << "Unable to open file";
 		}
+		catch (exception e)
+		{
+			cout << "Unable to open file: ", e;
+		}
+		//string line;
+		//ifstream myfile("title.txt");
+		//if (myfile.is_open()) {
+		//	for (int i = 1; getline(myfile, line); i++) {
+		//		// print the title
+		//		TCODConsole::root->print(0, i, (line + "\n").c_str());
+		//	}
+		//	myfile.close();
+		//} else {
+		//	cout << "Unable to open file";
+		//}
 
 		menux = 10;
 		menuy = TCODConsole::root->getHeight() / 3;
