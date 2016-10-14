@@ -37,7 +37,7 @@ public:
 	void save(TCODZip &zip);
 
 	friend std::ostream& operator<<(std::ostream&, const Actor&);
-	friend void swap(Actor& first, Actor& second);
+	//friend void swap(Actor& first, Actor& second);
 
 private:
 	const char *name; // the actor's name

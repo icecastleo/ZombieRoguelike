@@ -44,6 +44,7 @@ Actor::Actor(const Actor &other) :
 }
 
 Actor::Actor(Actor && other) : Actor() {
+	using std::swap;
 	swap(*this, other);
 }
 
@@ -104,22 +105,21 @@ std::ostream & operator<<(std::ostream &stream, const Actor &actor) {
 	return stream << "Actor - " << actor.name <<" is represent as '" << actor.ch << "'" << " at " << actor.x << "," << actor.y;
 }
 
-void swap(Actor& first, Actor& second) {
-	using std::swap;
-
-	swap(first.x, second.x);
-	swap(first.y, second.y);
-	swap(first.ch, second.ch);
-	swap(first.col, second.col);
-	swap(first.name, second.name);
-	swap(first.blocks, second.blocks);
-	swap(first.fovOnly, second.fovOnly);
-	swap(first.describer, second.describer);
-	swap(first.attacker, second.attacker);
-	swap(first.destructible, second.destructible);
-	swap(first.ai, second.ai);
-	swap(first.pickable, second.pickable);
-	swap(first.usable, second.usable);
-	swap(first.container, second.container);
-}
-
+//void swap(Actor& first, Actor& second) {
+//	using std::swap;
+//
+//	swap(first.x, second.x);
+//	swap(first.y, second.y);
+//	swap(first.ch, second.ch);
+//	swap(first.col, second.col);
+//	swap(first.name, second.name);
+//	swap(first.blocks, second.blocks);
+//	swap(first.fovOnly, second.fovOnly);
+//	swap(first.describer, second.describer);
+//	swap(first.attacker, second.attacker);
+//	swap(first.destructible, second.destructible);
+//	swap(first.ai, second.ai);
+//	swap(first.pickable, second.pickable);
+//	swap(first.usable, second.usable);
+//	swap(first.container, second.container);
+//}

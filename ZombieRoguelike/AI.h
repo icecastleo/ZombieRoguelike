@@ -33,6 +33,16 @@ protected:
 	bool duplicate;
 };
 
+class TeleportAi : public MonsterAi {
+public:
+	TeleportAi();
+	Ai* copy() override;
+	void update(Actor *owner) override;
+protected:
+	bool teleport;
+	bool wait;
+};
+
 class PlayerAi : public Ai {
 public:
 	int xpLevel;

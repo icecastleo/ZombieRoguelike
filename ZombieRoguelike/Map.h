@@ -32,6 +32,9 @@ protected:
 
 	void dig(int x1, int y1, int x2, int y2);
 	void createRoom(bool first, int x1, int y1, int x2, int y2, bool withActors);
-	void addMonster(int x, int y);
+	virtual void addMonster(int x, int y, char c);
 	void addItem(int x, int y);
+
+private:
+	void addMonster(int x, int y);
 };

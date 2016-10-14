@@ -1,6 +1,9 @@
 #pragma once
 #include "libtcod.hpp"
 #include <string>
+#include <list>
+
+#include "catch.hpp"
 
 #define START_HP 100
 #define LEVEL_UP_BASE 200

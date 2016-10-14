@@ -54,6 +54,15 @@ void Engine::term() {
 	gui->clear();
 }
 
+TEST_CASE("Factorials are computed", "[factorial]") {
+	//REQUIRE(Factorial(1) == 1);
+	//REQUIRE(Factorial(2) == 2);
+	//REQUIRE(Factorial(3) == 6);
+	//REQUIRE(Factorial(10) == 3628800);
+
+	REQUIRE(1 != 1);
+}
+
 void Engine::update() {
 	if (gameStatus == STARTUP) 
 		map->computeFov();
@@ -66,7 +75,7 @@ void Engine::update() {
 		load(true);
 	}
 	player->update();
-	
+
 	if (gameStatus == NEW_TURN) {
 		for (Actor **iterator = actors.begin(); iterator != actors.end();
 			iterator++) {

@@ -102,32 +102,67 @@ void Map::addMonster(int x, int y) {
 	TCODRandom *rng = TCODRandom::getInstance();
 	int dice = rng->getInt(0, 100);
 
-	if (dice < 1) {
+	if (dice < 80) {
+		addMonster(x, y, 'T');
+	}
+	else {
+		addMonster(x, y, 'Z');
+	}
+}
+
+void Map::addMonster(int x, int y, char c) {
+	TCODRandom *rng = TCODRandom::getInstance();
+	//int dice = rng->getInt(0, 100);
+
+	Actor *actor;
+
+	switch (c)
+	{
+	case 'z': 
 		// create an zombie
-		Actor *zombie = new Actor(x, y, 'z', "Zombie",
+		actor = new Actor(x, y, 'z', "Zombie",
 			TCODColor::desaturatedGreen);
-		zombie->describer = new MonsterDescriber();
-		zombie->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
-		zombie->attacker = new Attacker(3);
-		zombie->ai = new MonsterAi();
-		engine.actors.push(zombie);
-	} else if (dice < 2) {
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
+		actor->attacker = new Attacker(3);
+		actor->ai = new MonsterAi();
+		engine.actors.push(actor);
+		break;
+	
+
+	case 'Z': 
 		// create a fleshy zombie
-		Actor *fleshy = new Actor(x, y, 'Z', "Fleshy Zombie",
+		actor = new Actor(x, y, 'Z', "Fleshy Zombie",
 			TCODColor::darkerGreen);
-		fleshy->describer = new MonsterDescriber();
-		fleshy->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
-		fleshy->attacker = new Attacker(4);
-		fleshy->ai = new MonsterAi();
-		engine.actors.push(fleshy);
-	} else if (dice < 100) {
-		Actor *duplicate = new Actor(x, y, 'D', "Duplicated Zombie",
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
+		actor->attacker = new Attacker(4);
+		actor->ai = new MonsterAi();
+		engine.actors.push(actor);
+		break;
+	
+	case 'D':
+		actor = new Actor(x, y, 'D', "Duplicated Zombie",
 			TCODColor::darkerGreen);
-		duplicate->describer = new MonsterDescriber();
-		duplicate->destructible = new MonsterDestructible(12, 0, "Duplicated zombie debris", 75);
-		duplicate->attacker = new Attacker(3);
-		duplicate->ai = new DuplicateAi();
-		engine.actors.push(duplicate);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(12, 0, "Duplicated zombie debris", 75);
+		actor->attacker = new Attacker(3);
+		actor->ai = new DuplicateAi();
+		engine.actors.push(actor);
+		break;
+
+	case 'T':
+		actor = new Actor(x, y, 'T', "Teleport Zombie",
+			TCODColor::darkerGreen);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(20, 0, "Teleport zombie debris", 150);
+		actor->attacker = new Attacker(5);
+		actor->ai = new TeleportAi();
+		engine.actors.push(actor);
+		break;
+
+	default:
+		break;
 	}
 }
 

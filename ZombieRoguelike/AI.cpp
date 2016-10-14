@@ -64,14 +64,37 @@ Ai* DuplicateAi::copy() {
 }
 
 void DuplicateAi::update(Actor *owner) {
-	if (duplicate == false && engine.map->isInFov(owner->x, owner->y)) {
+	if (!duplicate && engine.map->isInFov(owner->x, owner->y)) {
 		// we can see the player. duplicate another actor
 		duplicate = true;
 
 		Actor *twins = new Actor(*owner);
-		//twins->x = owner->x + 1;
-		//twins->y = owner->y + 1;
 		engine.actors.push(twins);		
+	}
+
+	MonsterAi::update(owner);
+}
+
+TeleportAi::TeleportAi() : teleport(false), wait(false) {
+
+}
+
+Ai* TeleportAi::copy() {
+	return new TeleportAi(*this);
+}
+
+void TeleportAi::update(Actor *owner) {
+	if (!teleport && engine.map->isInFov(owner->x, owner->y)) {
+		if (!wait) {
+			// for render and better user experience, wait for a turn
+			wait = true;
+		}
+		else {
+			// we can see the player. teleport actor
+			teleport = true;
+			owner->x += (engine.player->x - owner->x) / 2;
+			owner->y += (engine.player->y - owner->y) / 2;
+		}
 	}
 
 	MonsterAi::update(owner);
