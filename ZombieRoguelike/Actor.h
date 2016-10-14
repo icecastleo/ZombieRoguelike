@@ -5,10 +5,10 @@ public:
 	int x, y; // position on map
 	int ch; // ascii code
 	TCODColor col; // color
-	const char *name; // the actor's name
+
 	bool blocks; // can we walk on this actor?
 	bool fovOnly; // only display when in fov
-
+	
 	Describer *describer; // something that can be described
 	Attacker *attacker; // something that deals damages
 	Destructible *destructible; // something that can be damaged
@@ -19,6 +19,9 @@ public:
 
 	Actor(int x, int y, int ch, const char *name, const TCODColor &col);
 	~Actor();
+
+	const char *getName() const;
+
 	void update();
 	void render() const;
 	float getDistance(int cx, int cy) const;
@@ -26,6 +29,9 @@ public:
 	void save(TCODZip &zip);
 
 	friend std::ostream& operator<<(std::ostream&, const Actor&);
+
+private:
+	const char *name; // the actor's name
 };
 
 

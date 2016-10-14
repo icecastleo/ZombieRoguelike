@@ -2,6 +2,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "main.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
 
 static const int PANEL_HEIGHT = 7;
 static const int BAR_WIDTH = 20;
@@ -108,7 +113,7 @@ void Gui::renderMouseLook() {
 			else {
 				first = false;
 			}
-			strcat_s(buf, actor->name);
+			strcat_s(buf, actor->getName());
 			
 			if (actor->describer) {
 				strcat_s(buf, " : ");
@@ -187,6 +192,22 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 	else {
 		static TCODImage img("menu_background1.png");
 		img.blit2x(TCODConsole::root, 0, 0);
+
+		TCODConsole::root->setDefaultForeground(TCODColor::lighterOrange);
+
+		// read title from file
+		string line;
+		ifstream myfile("title.txt");
+		if (myfile.is_open()) {
+			for (int i = 1; getline(myfile, line); i++) {
+				// print the title
+				TCODConsole::root->print(0, i, (line + "\n").c_str());
+			}
+			myfile.close();
+		} else {
+			cout << "Unable to open file";
+		}
+
 		menux = 10;
 		menuy = TCODConsole::root->getHeight() / 3;
 	}

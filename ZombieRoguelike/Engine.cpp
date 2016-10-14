@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "main.h"
 #include <math.h>
-#include <iostream>
+#include <sstream>
 
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
@@ -23,17 +23,23 @@ void Engine::init() {
 	stairs->fovOnly = false;
 	actors.push(stairs);
 
-	std::cout << player;
-
 	map = new Map(80, 43);
 	map->init(true);
 
-#ifdef _M_X64
-	engine.gui->message(TCODColor::yellow, "Hello player with x64 processors!!");
+#ifdef _WIN64
+	engine.gui->message(TCODColor::yellow, "This is a 64-bit program!!");
+#else
+	engine.gui->message(TCODColor::yellow, "This is a 32-bit program!!");
 #endif
 
 	gui->message(TCODColor::red,
 		"Welcome stranger!\nPrepare to escape from endless zombies in the dungeons.");
+
+	// print out player
+	std::stringstream ss;
+	ss << *player;
+	engine.gui->message(TCODColor::lightGrey, ss.str().c_str());
+
 	gameStatus = STARTUP;
 }
 
