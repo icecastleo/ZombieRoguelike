@@ -178,7 +178,21 @@ void Engine::nextLevel() {
 		}
 	}
 	// create a new map
-	map = new Map(80, 43);
-	map->init(true);
-	gameStatus = STARTUP;
+	Map *map1 = new Map(100, 43);
+	Map *map2 = new Map(150, 43);
+
+	map2 = map1;
+
+	if (level < 2)
+	{
+		map = new Map(80, 43);
+		map->init(true);
+		gameStatus = STARTUP;
+	}
+	else
+	{
+		map = new Map(*map2);
+		map->init(true);
+		gameStatus = STARTUP;
+	}
 }
