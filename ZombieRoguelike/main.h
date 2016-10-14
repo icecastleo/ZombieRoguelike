@@ -1,6 +1,11 @@
 #pragma once
 #include "libtcod.hpp"
 #include <string>
+
+#define START_HP 100
+#define LEVEL_UP_BASE 200;
+#define LEVEL_UP_FACTOR 150;
+
 class Actor;
 #include "Persistent.h"
 #include "Destructible.h"
@@ -15,8 +20,6 @@ class Actor;
 #include "Map.h"
 #include "Gui.h"
 #include "Engine.h"
-
-#define healthPoints 250
 
 //#define NDEBUG 
 #include <assert.h>

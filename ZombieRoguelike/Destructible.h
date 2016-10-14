@@ -10,6 +10,7 @@ public:
 	Destructible(float maxHp, float defense, const char *corpseName, int xp);
 	inline bool isDead() { return hp <= 0; }
 	float takeDamage(Actor *owner, float damage);
+	float heal();
 	float heal(float amount);
 	virtual void die(Actor *owner);
 	void load(TCODZip &zip);

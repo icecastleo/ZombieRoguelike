@@ -24,6 +24,8 @@ public:
 	float getDistance(int cx, int cy) const;
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
+
+	friend std::ostream& operator<<(std::ostream&, const Actor&);
 };
 
 

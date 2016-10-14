@@ -8,5 +8,5 @@ char *PlayerDescriber::getDescription(Actor *owner)
 
 char *MonsterDescriber::getDescription(Actor *owner)
 {	
-	return "monster des";
+	return "just a normal zombie..";
 }
