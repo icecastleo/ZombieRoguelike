@@ -177,7 +177,7 @@ void Engine::nextLevel() {
 
 	map2 = map1;
 
-	if (level < 2)
+	if (level < 4)
 	{
 		map = new Map(80, 43);
 		map->init(true);
