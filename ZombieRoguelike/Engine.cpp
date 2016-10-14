@@ -172,7 +172,10 @@ void Engine::nextLevel() {
 		}
 	}
 	// create a new map
-	Map *map2 = new Map(100, 43);
+	Map *map1 = new Map(100, 43);
+	Map *map2 = new Map(150, 43);
+
+	map2 = map1;
 
 	if (level < 2)
 	{

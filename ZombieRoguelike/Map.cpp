@@ -54,6 +54,17 @@ Map::Map(const Map& otherMap)
 	seed = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
 }
 
+Map& Map::operator=(Map const& otherMap)
+{
+	if (this != &otherMap)
+	{
+		width = otherMap.width;
+		height = otherMap.height;
+		seed = otherMap.seed;
+	}
+	return *this;
+}
+
 void Map::init(bool withActors) {
 	rng = new TCODRandom(seed, TCOD_RNG_CMWC);
 	tiles = new Tile[width*height];
@@ -90,8 +101,8 @@ void Map::dig(int x1, int y1, int x2, int y2) {
 void Map::addMonster(int x, int y) {
 	TCODRandom *rng = TCODRandom::getInstance();
 	if (rng->getInt(0, 100) < 80) {
-		// create an orc
-		Actor *zombie = new Actor(x, y, 'z', "zombie",
+		// create an zombie
+		Actor *zombie = new Actor(x, y, 'z', "Zombie",
 			TCODColor::desaturatedGreen);
 		zombie->describer = new MonsterDescriber();
 		zombie->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
@@ -100,8 +111,8 @@ void Map::addMonster(int x, int y) {
 		engine.actors.push(zombie);
 	}
 	else {
-		// create a troll
-		Actor *fleshy = new Actor(x, y, 'Z', "fleshy zombie ",
+		// create a fleshy zombie
+		Actor *fleshy = new Actor(x, y, 'Z', "Fleshy Zombie ",
 			TCODColor::darkerGreen);
 		fleshy->describer = new MonsterDescriber();
 		fleshy->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
@@ -116,8 +127,8 @@ void Map::addItem(int x, int y) {
 	int dice = rng->getInt(0, 100);
 	if (dice < 50) {
 		// create a bread
-		Actor *rice = new Actor(x, y, '!', "rice",
-			TCODColor::violet);
+		Actor *rice = new Actor(x, y, '*', "rice",
+			TCODColor::amber);
 		rice->blocks = false;
 		rice->usable = new Healer(12);
 		engine.actors.push(rice);
