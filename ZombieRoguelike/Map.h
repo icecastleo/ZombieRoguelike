@@ -10,6 +10,7 @@ public:
 	int width, height;
 
 	Map(int width, int height);
+	Map(const Map& otherMap);
 	~Map();
 	bool isWall(int x, int y) const;
 	bool isInFov(int x, int y) const;

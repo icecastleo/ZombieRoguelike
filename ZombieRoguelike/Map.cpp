@@ -46,6 +46,14 @@ Map::Map(int width, int height)
 	seed = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
 }
 
+Map::Map(const Map& otherMap)
+{
+	width = otherMap.width;
+	height = otherMap.height;
+
+	seed = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
+}
+
 void Map::init(bool withActors) {
 	rng = new TCODRandom(seed, TCOD_RNG_CMWC);
 	tiles = new Tile[width*height];

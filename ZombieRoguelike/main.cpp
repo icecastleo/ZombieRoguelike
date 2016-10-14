@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <iostream>
 
-Engine engine(80, 50);
+Engine engine(100, 50);
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
 {
