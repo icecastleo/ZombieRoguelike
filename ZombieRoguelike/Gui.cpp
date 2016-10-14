@@ -196,10 +196,11 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 		TCODConsole::root->setDefaultForeground(TCODColor::lighterOrange);
 
 		// read title from file
+		string line;
+		ifstream myfile("title.txt");
+		myfile.exceptions(ifstream::failbit | ifstream::badbit);
 		try
 		{
-			string line;
-			ifstream myfile("title.txt");
 			if (myfile.is_open()) {
 				for (int i = 1; getline(myfile, line); i++) {
 					// print the title
@@ -208,9 +209,9 @@ Menu::MenuItemCode Menu::pick(DisplayMode mode) {
 				myfile.close();
 			}
 		}
-		catch (exception e)
+		catch (ifstream::failure e)
 		{
-			cout << "Unable to open file: ", e;
+			cerr << "Unable to open file: ", e;
 		}
 		//string line;
 		//ifstream myfile("title.txt");
