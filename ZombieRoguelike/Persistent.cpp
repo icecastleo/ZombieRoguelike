@@ -141,16 +141,16 @@ void MonsterAi::save(TCODZip &zip) {
 	zip.putInt(moveCount);
 }
 
-void ConfusedMonsterAi::load(TCODZip &zip) {
-	nbTurns = zip.getInt();
-	oldAi = Ai::create(zip);
-}
-
-void ConfusedMonsterAi::save(TCODZip &zip) {
-	zip.putInt(CONFUSED_MONSTER);
-	zip.putInt(nbTurns);
-	oldAi->save(zip);
-}
+//void ConfusedMonsterAi::load(TCODZip &zip) {
+//	nbTurns = zip.getInt();
+//	oldAi = Ai::create(zip);
+//}
+//
+//void ConfusedMonsterAi::save(TCODZip &zip) {
+//	zip.putInt(CONFUSED_MONSTER);
+//	zip.putInt(nbTurns);
+//	oldAi->save(zip);
+//}
 
 void PlayerAi::load(TCODZip &zip) {
 	xpLevel = zip.getInt();
@@ -167,7 +167,7 @@ Ai *Ai::create(TCODZip &zip) {
 	switch (type) {
 	case PLAYER: ai = new PlayerAi(); break;
 	case MONSTER: ai = new MonsterAi(); break;
-	case CONFUSED_MONSTER: ai = new ConfusedMonsterAi(0, NULL); break;
+	//case CONFUSED_MONSTER: ai = new ConfusedMonsterAi(0, NULL); break;
 	}
 	ai->load(zip);
 	return ai;

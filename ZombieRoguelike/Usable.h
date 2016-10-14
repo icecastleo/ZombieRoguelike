@@ -2,6 +2,9 @@
 class Usable
 {
 public:
+	virtual ~Usable() = default;
+
+	virtual Usable* copy() = 0;
 	virtual bool use(Actor *owner, Actor *wearer) = 0;
 };
 
@@ -10,7 +13,8 @@ public:
 	float amount; // how many hp
 
 	Healer(float amount);
-	bool use(Actor *owner, Actor *wearer);
+	Healer* copy() override;;
+	bool use(Actor *owner, Actor *wearer) override;
 	//void load(TCODZip &zip);
 	//void save(TCODZip &zip);
 };

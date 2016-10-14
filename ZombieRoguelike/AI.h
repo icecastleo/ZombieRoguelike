@@ -2,6 +2,7 @@
 
 class Ai : public Persistent {
 public:
+	virtual Ai* copy() = 0;
 	virtual void update(Actor *owner) = 0;
 	static Ai *create(TCODZip &zip);
 protected:
@@ -13,7 +14,8 @@ protected:
 class MonsterAi : public Ai {
 public:
 	MonsterAi();
-	void update(Actor *owner);
+	Ai* copy() override;
+	void update(Actor *owner) override;
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
 protected:
@@ -22,23 +24,22 @@ protected:
 	void moveOrAttack(Actor *owner, int targetx, int targety);
 };
 
-class ConfusedMonsterAi : public Ai {
+class DuplicateAi : public MonsterAi {
 public:
-	ConfusedMonsterAi(int nbTurns, Ai *oldAi);
-	void update(Actor *owner);
-	void load(TCODZip &zip);
-	void save(TCODZip &zip);
+	DuplicateAi();
+	Ai* copy() override;
+	void update(Actor *owner) override;
 protected:
-	int nbTurns;
-	Ai *oldAi;
+	bool duplicate;
 };
 
 class PlayerAi : public Ai {
 public:
 	int xpLevel;
 	PlayerAi();
+	Ai* copy() override;
 	int getNextLevelXp();
-	void update(Actor *owner);
+	void update(Actor *owner) override;
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
 protected:

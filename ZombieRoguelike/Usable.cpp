@@ -4,6 +4,10 @@
 Healer::Healer(float amount) : amount(amount) {
 }
 
+Healer * Healer::copy() {
+	return new Healer(*this);
+}
+
 bool Healer::use(Actor *owner, Actor *wearer) {
 	if (wearer->destructible) {
 		float amountHealed = wearer->destructible->heal(amount);

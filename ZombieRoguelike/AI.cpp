@@ -10,6 +10,10 @@ static const int TRACKING_TURNS = 3;
 MonsterAi::MonsterAi() : moveCount(0) {
 }
 
+Ai* MonsterAi::copy() {
+	return new MonsterAi(*this);
+}
+
 void MonsterAi::update(Actor *owner) {
 	if (owner->destructible && owner->destructible->isDead()) {
 		return;
@@ -51,38 +55,65 @@ void MonsterAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 	}
 }
 
-ConfusedMonsterAi::ConfusedMonsterAi(int nbTurns, Ai *oldAi)
-	: nbTurns(nbTurns), oldAi(oldAi) {
+DuplicateAi::DuplicateAi():duplicate(false) {
+
 }
 
-void ConfusedMonsterAi::update(Actor *owner) {
-	if (!owner->destructible || !owner->destructible->isDead()) {
-		TCODRandom *rng = TCODRandom::getInstance();
-		int dx = rng->getInt(-1, 1);
-		int dy = rng->getInt(-1, 1);
-		if (dx != 0 || dy != 0) {
-			int destx = owner->x + dx;
-			int desty = owner->y + dy;
-			if (engine.map->canWalk(destx, desty)) {
-				owner->x = destx;
-				owner->y = desty;
-			}
-			else {
-				Actor *actor = engine.getActor(destx, desty);
-				if (actor) {
-					owner->attacker->attack(owner, actor);
-				}
-			}
-		}
-	}
-	nbTurns--;
-	if (nbTurns == 0) {
-		owner->ai = oldAi;
-		delete this;
-	}
+Ai* DuplicateAi::copy() {
+	return new DuplicateAi(*this);
 }
+
+void DuplicateAi::update(Actor *owner) {
+	if (duplicate == false && engine.map->isInFov(owner->x, owner->y)) {
+		// we can see the player. duplicate another actor
+		duplicate = true;
+
+		Actor *twins = new Actor(*owner);
+		//twins->x = owner->x + 1;
+		//twins->y = owner->y + 1;
+		engine.actors.push(twins);		
+	}
+
+	MonsterAi::update(owner);
+}
+
+//
+//ConfusedMonsterAi::ConfusedMonsterAi(int nbTurns, Ai *oldAi)
+//	: nbTurns(nbTurns), oldAi(oldAi) {
+//}
+//
+//void ConfusedMonsterAi::update(Actor *owner) {
+//	if (!owner->destructible || !owner->destructible->isDead()) {
+//		TCODRandom *rng = TCODRandom::getInstance();
+//		int dx = rng->getInt(-1, 1);
+//		int dy = rng->getInt(-1, 1);
+//		if (dx != 0 || dy != 0) {
+//			int destx = owner->x + dx;
+//			int desty = owner->y + dy;
+//			if (engine.map->canWalk(destx, desty)) {
+//				owner->x = destx;
+//				owner->y = desty;
+//			}
+//			else {
+//				Actor *actor = engine.getActor(destx, desty);
+//				if (actor) {
+//					owner->attacker->attack(owner, actor);
+//				}
+//			}
+//		}
+//	}
+//	nbTurns--;
+//	if (nbTurns == 0) {
+//		owner->ai = oldAi;
+//		delete this;
+//	}
+//}
 
 PlayerAi::PlayerAi() : xpLevel(1) {
+}
+
+Ai* PlayerAi::copy() {
+	return new PlayerAi(*this);
 }
 
 int PlayerAi::getNextLevelXp() {
@@ -157,7 +188,6 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 	}
 
 	// nothing will block the player, move player
-	
 	owner->x = targetx;
 	owner->y = targety;
 

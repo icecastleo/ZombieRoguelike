@@ -1,12 +1,18 @@
 #include "stdafx.h"
 #include "main.h"
 
-char *PlayerDescriber::getDescription(Actor *owner)
-{
+Describer* PlayerDescriber::copy() {
+	return new PlayerDescriber(*this);
+}
+
+char *PlayerDescriber::getDescription(Actor *owner) {
 	return "unnamed hero, trying to survive in this game..";
 }
 
-char *MonsterDescriber::getDescription(Actor *owner)
-{	
+Describer* MonsterDescriber::copy() {
+	return new MonsterDescriber(*this);
+}
+
+char *MonsterDescriber::getDescription(Actor *owner) {	
 	return "just a normal zombie..";
 }
