@@ -180,12 +180,12 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 		}
 
 		if (actor->destructible && actor->destructible->isDead()) {
-			engine.gui->message(TCODColor::lightGrey, "There's a daed %s here.", actor->name);
+			engine.gui->message(TCODColor::lightGrey, "There's a %s here.", actor->destructible->corpseName);
 		} 
 		else if (actor->pickable) {
 			// pick up item
 			if (!actor->pickable->pick(actor, owner)) {
-				engine.gui->message(TCODColor::lightGrey, "Your package is full, cannot pick %s..", actor->name);
+				engine.gui->message(TCODColor::lightGrey, "Your package is full, cannot pick %s..", actor->getName());
 			}
 		} 
 		else if (actor->usable) {
@@ -197,9 +197,9 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 				Healer *healer = dynamic_cast<Healer *>(actor->usable);
 
 				if (healer) { // dynamic cast successfully
-					engine.gui->message(TCODColor::lightGrey, "Your hp is full!! You cannot eat %s right now!!", actor->name);
+					engine.gui->message(TCODColor::lightGrey, "Your hp is full!! You cannot eat %s right now!!", actor->getName());
 				} else {
-					engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->name);
+					engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->getName());
 				}
 			}
 		}
@@ -229,7 +229,7 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii) {
 	//			if (actor->pickable->pick(actor, owner)) {
 	//				found = true;
 	//				engine.gui->message(TCODColor::lightGrey, "You pick the %s.",
-	//					actor->name);
+	//					actor->getName());
 	//				break;
 	//			}
 	//			else if (!found) {
@@ -257,7 +257,7 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii) {
 
 				engine.gameStatus = Engine::NEW_TURN;
 			} else {
-				engine.gui->message(TCODColor::red, "%s cannot be used..", actor->name);
+				engine.gui->message(TCODColor::red, "%s cannot be used..", actor->getName());
 			}
 		}
 	}
@@ -290,7 +290,7 @@ Actor *PlayerAi::choseFromInventory(Actor *owner) {
 	for (Actor **it = owner->container->inventory.begin();
 		it != owner->container->inventory.end(); it++) {
 		Actor *actor = *it;
-		con.print(2, y, "(%c) %s", shortcut, actor->name);
+		con.print(2, y, "(%c) %s", shortcut, actor->getName());
 		y++;
 		shortcut++;
 	}

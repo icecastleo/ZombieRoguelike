@@ -39,7 +39,6 @@ void Destructible::die(Actor *owner) {
 	// transform the actor into a corpse!
 	owner->ch = '%';
 	owner->col = TCODColor::darkRed;
-	owner->name = corpseName;
 	owner->blocks = false;
 	// make sure corpses are drawn before living actors
 	engine.sendToBack(owner);
@@ -53,7 +52,7 @@ void MonsterDestructible::die(Actor *owner) {
 	// transform it into a nasty corpse! it doesn't block, can't be
 	// attacked and doesn't move
 	engine.gui->message(TCODColor::lightGrey, "%s is dead. You gain %d xp",
-		owner->name, xp);
+		owner->getName(), xp);
 	engine.player->destructible->xp += xp;
 	Destructible::die(owner);
 }

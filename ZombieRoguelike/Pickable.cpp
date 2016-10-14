@@ -3,7 +3,7 @@
 
 bool Pickable::pick(Actor *owner, Actor *wearer) {
 	if (wearer->container && wearer->container->add(owner)) {
-		engine.gui->message(TCODColor::lightGrey, "%s picks up a %s.", wearer->name, owner->name);
+		engine.gui->message(TCODColor::lightGrey, "%s picks up a %s.", wearer->getName(), owner->getName());
 		engine.actors.remove(owner);
 		return true;
 	}
@@ -17,7 +17,7 @@ void Pickable::drop(Actor *owner, Actor *wearer) {
 		owner->x = wearer->x;
 		owner->y = wearer->y;
 		engine.gui->message(TCODColor::lightGrey, "%s drops a %s.",
-			wearer->name, owner->name);
+			wearer->getName(), owner->getName());
 	}
 }
 
@@ -35,7 +35,7 @@ void Pickable::drop(Actor *owner, Actor *wearer) {
 //	engine.gui->message(TCODColor::lightBlue,
 //		"A lighting bolt strikes the %s with a loud thunder!\n"
 //		"The damage is %g hit points.",
-//		closestMonster->name, damage);
+//		closestMonster->getName(), damage);
 //	closestMonster->destructible->takeDamage(closestMonster, damage);
 //	return Pickable::pick(owner, wearer);
 //}
@@ -59,7 +59,7 @@ void Pickable::drop(Actor *owner, Actor *wearer) {
 //	Ai *confusedAi = new ConfusedMonsterAi(nbTurns, actor->ai);
 //	actor->ai = confusedAi;
 //	engine.gui->message(TCODColor::lightGreen, "The eyes of the %s look vacant,\nas he starts to stumble around!",
-//		actor->name);
+//		actor->getName());
 //	return Pickable::pick(owner, wearer);
 //}
 //
@@ -81,7 +81,7 @@ void Pickable::drop(Actor *owner, Actor *wearer) {
 //		if (actor->destructible && !actor->destructible->isDead()
 //			&& actor->getDistance(x, y) <= range) {
 //			engine.gui->message(TCODColor::orange, "The %s gets burned for %g hit points.",
-//				actor->name, damage);
+//				actor->getName(), damage);
 //			actor->destructible->takeDamage(actor, damage);
 //		}
 //	}

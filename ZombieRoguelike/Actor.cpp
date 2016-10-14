@@ -19,6 +19,10 @@ Actor::~Actor() {
 	if (container) delete container;
 }
 
+const char * Actor::getName() const {
+	return name;
+}
+
 void Actor::render() const {
 	TCODConsole::root->setChar(x, y, ch);
 	TCODConsole::root->setCharForeground(x, y, col);
@@ -31,9 +35,11 @@ void Actor::update() {
 float Actor::getDistance(int cx, int cy) const {
 	int dx = x - cx;
 	int dy = y - cy;
-	return sqrtf(dx*dx + dy*dy);
+
+	assert(SQRTF(dx, dy) == sqrtf(dx*dx + dy*dy));
+	return SQRTF(dx, dy);
 }
 
 std::ostream & operator<<(std::ostream &stream, const Actor &actor) {
-	return stream << "Actor - " << actor.name <<" is represent as '" << actor.ch << "'" << " at " << actor.x << "," << actor.y;
+	return stream << "Actor - " << actor.name <<" is represent as '" << (char)actor.ch << "'" << " at " << actor.x << "," << actor.y;
 }
