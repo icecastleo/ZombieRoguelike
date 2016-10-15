@@ -103,10 +103,23 @@ void Map::addMonster(int x, int y) {
 	int dice = rng->getInt(0, 100);
 
 	if (dice < 80) {
-		addMonster(x, y, 'T');
+		addMonster(x, y, 'z');
 	}
 	else {
 		addMonster(x, y, 'Z');
+	}
+}
+
+Map* Map::nextMap()
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+
+	if (dice < 40) {
+		return new Map(width, height);
+	}
+	else  {
+		return new AdvancedMap(width, height);
 	}
 }
 
@@ -128,7 +141,6 @@ void Map::addMonster(int x, int y, char c) {
 		actor->ai = new MonsterAi();
 		engine.actors.push(actor);
 		break;
-	
 
 	case 'Z': 
 		// create a fleshy zombie
@@ -174,15 +186,15 @@ void Map::addItem(int x, int y) {
 		Actor *rice = new Actor(x, y, '*', "rice",
 			TCODColor::amber);
 		rice->blocks = false;
-		rice->usable = new Healer(12);
+		rice->usable = new Healer(15);
 		engine.actors.push(rice);
 	}
-	else if (dice < 75) {
+	else if (dice < 80) {
 		Actor *bread = new Actor(x, y, '!', "bread",
 			TCODColor::violet);
 		bread->blocks = false;
 		bread->pickable = new Pickable();
-		bread->usable = new Healer(8);
+		bread->usable = new Healer(30);
 		engine.actors.push(bread);
 	}
 }
@@ -282,5 +294,57 @@ void Map::render() const {
 					isWall(x, y) ? darkWall : darkGround);
 			}
 		}
+	}
+}
+
+void AdvancedMap::addMonster(int x, int y)
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+
+	if (dice < 25) {
+		Map::addMonster(x, y, 'z');
+	} else if( dice < 50) {
+		Map::addMonster(x, y, 'Z');
+	} else if (dice < 75) {
+		Map::addMonster(x, y, 'D');
+	} else {
+		Map::addMonster(x, y, 'T');
+	}
+}
+
+Map* AdvancedMap::nextMap()
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+
+	if (dice < 40) {
+		return new AdvancedMap(width, height);
+	} else {
+		return new NightmareMap(width, height);
+	}
+}
+
+void NightmareMap::addMonster(int x, int y)
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+
+	if (dice < 50) {
+		Map::addMonster(x, y, 'D');
+	} else {
+		Map::addMonster(x, y, 'T');
+	}
+}
+
+Map* NightmareMap::nextMap()
+{
+	TCODRandom *rng = TCODRandom::getInstance();
+	int dice = rng->getInt(0, 100);
+
+	if (dice < 30) {
+		return new AdvancedMap(width, height);
+	} else {
+		return new NightmareMap(width, height);
 	}
 }

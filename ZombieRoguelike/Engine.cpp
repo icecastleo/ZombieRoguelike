@@ -169,6 +169,9 @@ void Engine::nextLevel() {
 	gui->message(TCODColor::lightViolet, "You take a moment to rest, and recover your strength.");
 	player->destructible->heal(player->destructible->maxHp / 2);
 	gui->message(TCODColor::red, "After a rare moment of peace, you descend\ndeeper into the heart of the dungeon...");
+
+	Map *next = map->nextMap();
+
 	delete map;
 	// delete all actors but player and stairs
 	for (Actor **it = actors.begin(); it != actors.end(); it++) {
@@ -177,6 +180,11 @@ void Engine::nextLevel() {
 			it = actors.remove(it);
 		}
 	}
+
+	map = next;
+	map->init(true);
+	gameStatus = STARTUP;
+
 	// create a new map
 	//Map *map1 = new Map(100, 43);
 	//Map *map2 = new Map(150, 43);
@@ -185,9 +193,9 @@ void Engine::nextLevel() {
 
 	//if (level < 2)
 	//{
-		map = new Map(80, 43);
+		/*map = new Map(80, 43);
 		map->init(true);
-		gameStatus = STARTUP;
+		gameStatus = STARTUP;*/
 	//}
 	//else
 	//{

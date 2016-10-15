@@ -19,6 +19,7 @@ public:
 	bool canWalk(int x, int y) const;
 	void computeFov();
 	void render() const;
+	virtual Map* nextMap();
 
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
@@ -32,9 +33,26 @@ protected:
 
 	void dig(int x1, int y1, int x2, int y2);
 	void createRoom(bool first, int x1, int y1, int x2, int y2, bool withActors);
-	virtual void addMonster(int x, int y, char c);
+	void addMonster(int x, int y, char c);
+	virtual void addMonster(int x, int y);
+	
 	void addItem(int x, int y);
-
-private:
-	void addMonster(int x, int y);
 };
+
+class AdvancedMap : public Map {
+public:
+	using Map::Map;
+	Map* nextMap();
+
+protected:
+	void addMonster(int x, int y) override;
+};
+
+class NightmareMap : public Map {
+public:
+	using Map::Map;
+	Map* nextMap();
+protected:
+	void addMonster(int x, int y) override;
+};
+
