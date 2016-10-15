@@ -273,57 +273,25 @@ void PlayerAi::handleActionKey(Actor *owner, int ascii) {
 		}
 	}
 	break;
-	//case 'g': // pickup item
-	//{
-	//	bool found = false;
-	//	for (Actor **iterator = engine.actors.begin();
-	//		iterator != engine.actors.end(); iterator++) {
-	//		Actor *actor = *iterator;
-	//		if (actor->pickable && actor->x == owner->x && actor->y == owner->y) {
-	//			if (actor->pickable->pick(actor, owner)) {
-	//				found = true;
-	//				engine.gui->message(TCODColor::lightGrey, "You pick the %s.",
-	//					actor->getName());
-	//				break;
-	//			}
-	//			else if (!found) {
-	//				found = true;
-	//				engine.gui->message(TCODColor::red, "Your inventory is full.");
-	//			}
-	//		}
-	//	}
-	//	if (!found) {
-	//		engine.gui->message(TCODColor::lightGrey, "There's nothing here that you can pick.");
-	//	}
-	//	engine.gameStatus = Engine::NEW_TURN;
-	//}
-	//break;
 	case 'i': // display inventory
 	{
 		Actor *actor = choseFromInventory(owner);
 		if (actor) {
 			if (actor->usable) {
 				actor->usable->use(actor, owner);
-				
+
 				// remove from inventory
 				owner->container->remove(actor);
 				delete actor;
 
 				engine.gameStatus = Engine::NEW_TURN;
-			} else {
+			}
+			else {
 				engine.gui->message(TCODColor::red, "%s cannot be used..", actor->getName());
 			}
 		}
 	}
 	break;
-	/*case '>':
-		if (engine.stairs->x == owner->x && engine.stairs->y == owner->y) {
-			engine.nextLevel();
-		}
-		else {
-			engine.gui->message(TCODColor::lightGrey, "There are no stairs here.");
-		}
-		break;*/
 	}
 }
 

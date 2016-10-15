@@ -54,15 +54,6 @@ void Engine::term() {
 	gui->clear();
 }
 
-TEST_CASE("Factorials are computed", "[factorial]") {
-	//REQUIRE(Factorial(1) == 1);
-	//REQUIRE(Factorial(2) == 2);
-	//REQUIRE(Factorial(3) == 6);
-	//REQUIRE(Factorial(10) == 3628800);
-
-	REQUIRE(1 != 1);
-}
-
 void Engine::update() {
 	if (gameStatus == STARTUP) 
 		map->computeFov();
@@ -204,4 +195,41 @@ void Engine::nextLevel() {
 	//	map->init(true);
 	//	gameStatus = STARTUP;
 	//}
+}
+
+TEST_CASE("Engine", "[init]") {
+
+	Engine e(80, 50);
+	REQUIRE(e.actors.size() == 0);
+
+	Actor *player = new Actor(40, 25, '@', "player", TCODColor::white);
+
+	// actor init
+	REQUIRE(player->x == 40);
+	REQUIRE(player->y == 25);
+	REQUIRE(player->getDistance(43, 29) == 5);
+
+	player->describer = new PlayerDescriber();
+	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
+	player->attacker = new Attacker(5);
+	player->ai = new PlayerAi();
+	player->container = new Container(26);
+
+
+	e.actors.push(player);
+	REQUIRE(e.actors.size() == 1);
+
+	Actor *zombie = new Actor(0, 0, 'z', "Zombie", TCODColor::desaturatedGreen);
+	zombie->describer = new MonsterDescriber();
+	zombie->destructible = new MonsterDestructible(10, 1, "zombie debris", 35);
+	zombie->attacker = new Attacker(3);
+	zombie->ai = new MonsterAi();
+	e.actors.push(zombie);
+	
+	// attack
+	player->attacker->attack(player, zombie);
+	REQUIRE(zombie->destructible->hp == 10-(5-1));
+
+	// fail test
+	REQUIRE(1 != 1);
 }
