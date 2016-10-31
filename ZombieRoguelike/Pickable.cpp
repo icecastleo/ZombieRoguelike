@@ -4,7 +4,6 @@
 bool Pickable::pick(Actor *owner, Actor *wearer) {
 	if (wearer->container && wearer->container->add(owner)) {
 		engine.gui->message(TCODColor::lightGrey, "%s picks up a %s.", wearer->getName(), owner->getName());
-		engine.actors.remove(owner);
 		return true;
 	}
 	return false;

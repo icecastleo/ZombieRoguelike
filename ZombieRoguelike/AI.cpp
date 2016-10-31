@@ -238,21 +238,26 @@ bool PlayerAi::moveOrAttack(Actor *owner, int targetx, int targety) {
 		} 
 		else if (actor->pickable) {
 			// pick up item
-			if (!actor->pickable->pick(actor, owner)) {
+			if (actor->pickable->pick(actor, owner)) {
+				iterator = engine.actors.remove(iterator);
+			}
+			else {
 				engine.gui->message(TCODColor::lightGrey, "Your package is full, cannot pick %s..", actor->getName());
 			}
 		} 
 		else if (actor->usable) {
 			// use item
 			if (actor->usable->use(actor, owner)) {
-				engine.actors.remove(actor);
+				delete actor;
+				iterator = engine.actors.remove(iterator);
 			}
 			else {
 				Healer *healer = dynamic_cast<Healer *>(actor->usable);
 
 				if (healer) { // dynamic cast successfully
 					engine.gui->message(TCODColor::lightGrey, "Your hp is full!! You cannot eat %s right now!!", actor->getName());
-				} else {
+				}
+				else {
 					engine.gui->message(TCODColor::lightGrey, "You cannot use %s right now..", actor->getName());
 				}
 			}

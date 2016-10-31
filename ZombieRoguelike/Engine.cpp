@@ -171,8 +171,8 @@ void Engine::nextLevel() {
 	gui->message(TCODColor::red, "After a rare moment of peace, you descend\ndeeper into the heart of the dungeon...");
 
 	Map *next = map->nextMap();
-
 	delete map;
+
 	// delete all actors but player and stairs
 	for (Actor **it = actors.begin(); it != actors.end(); it++) {
 		if (*it != player && *it != stairs) {
@@ -222,7 +222,6 @@ TEST_CASE("Engine", "[init]") {
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
 	player->container = new Container(26);
-
 
 	e.actors.push(player);
 	REQUIRE(e.actors.size() == 1);
