@@ -1,4 +1,7 @@
 #pragma once
+#include <string>
+
+using std::string;
 
 struct Tile {
 	bool explored; // has the player already seen this tile ?
@@ -20,6 +23,8 @@ public:
 	void computeFov();
 	void render() const;
 	virtual Map* nextMap();
+
+	string pathFind(const int & xStart, const int & yStart, const int & xFinish, const int & yFinish);
 
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);

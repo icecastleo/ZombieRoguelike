@@ -78,7 +78,11 @@ void Actor::setAscii(char ch) {
 
 void Actor::render() const {
 	TCODConsole::root->setChar(x, y, ch);
-	TCODConsole::root->setCharForeground(x, y, col);
+	TCODConsole::root->setCharForeground(x, y, col);  
+
+	if (ai) {
+		ai->render(this);
+	}
 }
 
 const TCODColor Actor::getColor() const {

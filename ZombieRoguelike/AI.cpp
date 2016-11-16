@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <math.h>
 #include "main.h"
+#include <string>;
+
+using std::string;
 
 // how many turns the monster chases the player
 // after losing his sight
@@ -132,7 +135,16 @@ void TeleportAi::update(Actor *owner) {
 //	}
 //}
 
+const int dir = 4; // number of possible directions to go at any position
+// if dir==4
+static int dxx[dir]={1, 0, -1, 0};
+static int dyy[dir]={0, 1, 0, -1};
+				   // if dir==8
+//static int dxx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+//static int dyy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
 PlayerAi::PlayerAi() : xpLevel(1) {
+	con = new TCODConsole(engine.screenWidth, engine.screenHeight);
 }
 
 Ai* PlayerAi::copy() {
@@ -173,24 +185,142 @@ void PlayerAi::update(Actor *owner) {
 	if (owner->destructible && owner->destructible->isDead()) {
 		return;
 	}
+
 	int dx = 0, dy = 0;
-	switch (engine.lastKey.vk) {
-	case TCODK_UP: case TCODK_KP8: dy = -1; break;
-	case TCODK_DOWN: case TCODK_KP2: dy = 1; break;
-	case TCODK_LEFT: case TCODK_KP4: dx = -1; break;
-	case TCODK_RIGHT: case TCODK_KP6: dx = 1; break;
-	case TCODK_KP7: dy = dx = -1; break;
-	case TCODK_KP9: dy = -1; dx = 1; break;
-	case TCODK_KP1: dx = -1; dy = 1; break;
-	case TCODK_KP3: dx = dy = 1; break;
-	case TCODK_KP5: engine.gameStatus = Engine::NEW_TURN; break;
-	case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
-	default:break;
+
+	if (engine.mouse.rbutton_pressed) {
+		if (engine.map->isExplored(engine.mouse.cx, engine.mouse.cy)) {
+			engine.gui->message(TCODColor::lightGrey, "You clicked (%d, %d)", engine.mouse.cx, engine.mouse.cy);
+			path = engine.map->pathFind(owner->x, owner->y, engine.mouse.cx, engine.mouse.cy);
+		}
+
+		//		// highlight the possible range
+		//		for (int cx = 0; cx < map->width; cx++) {
+		//			for (int cy = 0; cy < map->height; cy++) {
+		//				if (map->isInFov(cx, cy)
+		//					&& (maxRange == 0 || player->getDistance(cx, cy) <= maxRange)) {
+		//					TCODColor col = TCODConsole::root->getCharBackground(cx, cy);
+		//					col = col * 1.2f;
+		//					TCODConsole::root->setCharBackground(cx, cy, col);
+		//				}
+		//			}
+		//		}
+		//		TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
+		//		if (map->isInFov(mouse.cx, mouse.cy)
+		//			&& (maxRange == 0 || player->getDistance(mouse.cx, mouse.cy) <= maxRange)) {
+		//			TCODConsole::root->setCharBackground(mouse.cx, mouse.cy, TCODColor::white);
+		//			if (mouse.lbutton_pressed) {
+		//				*x = mouse.cx;
+		//				*y = mouse.cy;
+		//				return true;
+		//			}
+		//		}
+		//		if (mouse.rbutton_pressed || lastKey.vk != TCODK_NONE) {
+		//			return false;
+		//		}
+		//		TCODConsole::flush();
 	}
+	else {
+		switch (engine.lastKey.vk) {
+		case TCODK_UP: case TCODK_KP8: dy = -1; break;
+		case TCODK_DOWN: case TCODK_KP2: dy = 1; break;
+		case TCODK_LEFT: case TCODK_KP4: dx = -1; break;
+		case TCODK_RIGHT: case TCODK_KP6: dx = 1; break;
+		case TCODK_KP7: dy = dx = -1; break;
+		case TCODK_KP9: dy = -1; dx = 1; break;
+		case TCODK_KP1: dx = -1; dy = 1; break;
+		case TCODK_KP3: dx = dy = 1; break;
+		case TCODK_KP5: engine.gameStatus = Engine::NEW_TURN; break;
+		case TCODK_CHAR: handleActionKey(owner, engine.lastKey.c); break;
+		default:break;
+		}
+
+		if (dx != 0 || dy != 0) {
+			path.clear();
+		}
+	}
+
+	//if (!path.empty()) {
+	//	char c = path.at(0);
+	//	int j = atoi(&c);
+	//	dx = dxx[j];
+	//	dy = dyy[j];
+
+	//	path.erase(0, 1);
+	//}
+
+	//if (!path.empty()) {
+	//	char c; int j;
+	//	int x = owner->x;
+	//	int y = owner->y;
+	//	
+	//	// clear the Path console
+	//	con->setDefaultBackground(TCODColor::black);
+	//	con->clear();
+
+	//	for (int i = 0; i<path.length(); i++)
+	//	{
+	//		c = path.at(i);
+	//		j = atoi(&c);
+	//		x = x + dxx[j];
+	//		y = y + dyy[j];
+
+	//		TCODConsole::root->setChar(x, y, '#');
+	//		con->setCharForeground(x, y, TCODColor::white);
+
+	//		if (i == 0) {
+	//			printf("(%d, %d)", x, y);
+	//		}
+	//		else if (i == path.length() - 1) {
+	//			printf("\n");
+	//			//TCODConsole::root->clear();
+	//			//con->clear();
+	//		}
+	//		else {
+	//			printf(" -> (%d, %d)", x, y);
+	//		}
+	//	}
+
+	//	TCODConsole::blit(con, 0, 0, engine.screenWidth, engine.screenHeight,
+	//		TCODConsole::root, 0, 0);
+	//	//engine.screenWidth / 2, engine.screenHeight / 2
+	//}
+
 	if (dx != 0 || dy != 0) {
 		engine.gameStatus = Engine::NEW_TURN;
 		if (moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
 			engine.map->computeFov();
+		}
+	}
+}
+
+void PlayerAi::render(const Actor *owner) const {
+	if (!path.empty()) {
+		char c; int j;
+		int x = owner->x;
+		int y = owner->y;
+
+		for (int i = 0; i<path.length(); i++)
+		{
+			c = path.at(i);
+			j = atoi(&c);
+			x = x + dxx[j];
+			y = y + dyy[j];
+
+			//TCODConsole::root->setChar(x, y, '#');
+			TCODConsole::root->setCharBackground(x, y, TCODColor::grey);
+
+			//if (i == 0) {
+			//	printf("(%d, %d)", x, y);
+			//}
+			//else if (i == path.length() - 1) {
+			//	printf("\n");
+			//	//TCODConsole::root->clear();
+			//	//con->clear();
+			//}
+			//else {
+			//	printf(" -> (%d, %d)", x, y);
+			//}
 		}
 	}
 }

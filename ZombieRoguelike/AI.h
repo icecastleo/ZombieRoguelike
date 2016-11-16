@@ -1,10 +1,13 @@
 #include <stdio.h>
+#include <string>
 
 class Ai : public Persistent {
 public:
 	virtual Ai* copy() = 0;
 	virtual void update(Actor *owner) = 0;
 	static Ai *create(TCODZip &zip);
+
+	virtual void render(const Actor *owner) const {};
 protected:
 	enum AiType {
 		MONSTER, CONFUSED_MONSTER, PLAYER
@@ -52,8 +55,14 @@ public:
 	void update(Actor *owner) override;
 	void load(TCODZip &zip);
 	void save(TCODZip &zip);
+
+	std::string path;
+	void render(const Actor *owner) const;
+
 protected:
 	bool moveOrAttack(Actor *owner, int targetx, int targety);
 	void handleActionKey(Actor *owner, int ascii);
 	Actor *choseFromInventory(Actor *owner);
+
+	TCODConsole *con;
 };

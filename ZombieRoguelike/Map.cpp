@@ -1,10 +1,450 @@
 #include "stdafx.h"
 #include "main.h"
+//#include <queue>
+//using std::priority_queue;
 
 static const int ROOM_MAX_SIZE = 12;
 static const int ROOM_MIN_SIZE = 6;
 static const int MAX_ROOM_MONSTERS = 3;
 static const int MAX_ROOM_ITEMS = 2;
+
+const static int MAX_WIDTH = 100; // horizontal size of the map
+const static int MAX_HEIGHT = 100; // vertical size size of the map
+static int closed_nodes_map[MAX_WIDTH][MAX_HEIGHT]; // map of closed (tried-out) nodes
+static int open_nodes_map[MAX_WIDTH][MAX_HEIGHT]; // map of open (not-yet-tried) nodes
+static int dir_map[MAX_WIDTH][MAX_HEIGHT]; // map of directions
+
+const int dir = 4; // number of possible directions to go at any position
+
+// if dir==4
+static int dx[dir] = { 1, 0, -1, 0 };
+static int dy[dir] = { 0, 1, 0, -1 };
+
+// if dir==8
+//static int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+//static int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
+class node {
+	// current position
+	int xPos;
+	int yPos;
+	// total distance already travelled to reach the node
+	int level;
+	// priority=level+remaining distance estimate
+	int priority;  // smaller: higher priority
+
+public:
+	node() = default;
+
+	node(int xp, int yp, int d, int p) {
+		xPos = xp; yPos = yp; level = d; priority = p;
+	}
+
+	int getxPos() const { return xPos; }
+	int getyPos() const { return yPos; }
+	int getLevel() const { return level; }
+	int getPriority() const { return priority; }
+
+	void updatePriority(const int & xDest, const int & yDest) {
+		priority = level + estimate(xDest, yDest) * 10; //A*
+	}
+
+	// give better priority to going strait instead of diagonally
+	// i: direction 
+	void nextLevel(const int & i) {
+		level += (dir == 8 ? (i % 2 == 0 ? 10 : 14) : 10);
+	}
+
+	// Estimation function for the remaining distance to the goal.
+	const int & estimate(const int & xDest, const int & yDest) const {
+		static int xd, yd, d;
+		xd = xDest - xPos;
+		yd = yDest - yPos;
+
+		// Euclidian Distance
+		//d = static_cast<int>(sqrt(xd*xd + yd*yd));
+
+		// Manhattan distance
+		d=abs(xd)+abs(yd);
+
+		// Chebyshev distance
+		//d=max(abs(xd), abs(yd));
+
+		return(d);
+	}
+};
+
+template <class T>
+class C_Vector
+{
+public:
+	typedef T* iterator;
+
+	C_Vector();
+	C_Vector(unsigned int size);
+	C_Vector(unsigned int size, const T& initial);
+	C_Vector(const C_Vector<T>& v);
+	~C_Vector();
+
+	unsigned int capacity() const;
+	unsigned int size() const;
+	bool empty() const;
+	iterator begin();
+	iterator end();
+	T& front();
+	T& back();
+	void push_back(const T& value);
+	void pop_back();
+
+	void reserve(unsigned int capacity);
+	void resize(unsigned int size);
+
+	T& operator[](unsigned int index);
+	C_Vector<T> & operator=(const C_Vector<T> &);
+	void clear();
+private:
+	unsigned int my_size;
+	unsigned int my_capacity;
+	T* buffer;
+};
+
+template<class T>
+C_Vector<T>::C_Vector()
+{
+	my_capacity = 0;
+	my_size = 0;
+	buffer = 0;
+}
+
+template<class T>
+C_Vector<T>::C_Vector(const C_Vector<T> & v)
+{
+	my_size = v.my_size;
+	my_capacity = v.my_capacity;
+	buffer = new T[my_size];
+	for (unsigned int i = 0; i < my_size; i++)
+		buffer[i] = v.buffer[i];
+}
+
+template<class T>
+C_Vector<T>::C_Vector(unsigned int size)
+{
+	my_capacity = size;
+	my_size = size;
+	buffer = new T[size];
+}
+
+template<class T>
+C_Vector<T>::C_Vector(unsigned int size, const T & initial)
+{
+	my_size = size;
+	my_capacity = size;
+	buffer = new T[size];
+	for (unsigned int i = 0; i < size; i++)
+		buffer[i] = initial;
+	//T();
+}
+
+template<class T>
+C_Vector<T> & C_Vector<T>::operator = (const C_Vector<T> & v)
+{
+	delete[] buffer;
+	my_size = v.my_size;
+	my_capacity = v.my_capacity;
+	buffer = new T[my_size];
+	for (unsigned int i = 0; i < my_size; i++)
+		buffer[i] = v.buffer[i];
+	return *this;
+}
+
+template<class T>
+typename C_Vector<T>::iterator C_Vector<T>::begin()
+{
+	return buffer;
+}
+
+template<class T>
+typename C_Vector<T>::iterator C_Vector<T>::end()
+{
+	return buffer + size();
+}
+
+template<class T>
+T& C_Vector<T>::front()
+{
+	return buffer[0];
+}
+
+template<class T>
+T& C_Vector<T>::back()
+{
+	return buffer[my_size - 1];
+}
+
+template<class T>
+void C_Vector<T>::push_back(const T & v)
+{
+	if (my_size >= my_capacity)
+		reserve(my_capacity + 5);
+	buffer[my_size++] = v;
+}
+
+template<class T>
+void C_Vector<T>::pop_back()
+{
+	my_size--;
+}
+
+template<class T>
+void C_Vector<T>::reserve(unsigned int capacity)
+{
+	if (buffer == 0)
+	{
+		my_size = 0;
+		my_capacity = 0;
+	}
+	T * Newbuffer = new T[capacity];
+	//assert(Newbuffer);
+	unsigned int l_Size = capacity < my_size ? capacity : my_size;
+	//copy (buffer, buffer + l_Size, Newbuffer);
+
+	for (unsigned int i = 0; i < l_Size; i++) {
+		Newbuffer[i] = buffer[i];
+	}
+
+	my_capacity = capacity;
+	delete[] buffer;
+	buffer = Newbuffer;
+}
+
+template<class T>
+unsigned int C_Vector<T>::size()const//
+{
+	return my_size;
+}
+
+template<class T>
+void C_Vector<T>::resize(unsigned int size)
+{
+	reserve(size);
+	my_size = size;
+}
+
+template<class T>
+T& C_Vector<T>::operator[](unsigned int index)
+{
+	return buffer[index];
+}
+
+template<class T>
+unsigned int C_Vector<T>::capacity()const
+{
+	return my_capacity;
+}
+
+template <class T>
+bool C_Vector<T>::empty() const {
+	return my_size == 0;
+}
+
+template<class T>
+C_Vector<T>::~C_Vector()
+{
+	delete[] buffer;
+}
+
+template <class T>
+void C_Vector<T>::clear()
+{
+	my_capacity = 0;
+	my_size = 0;
+	buffer = 0;
+}
+
+template <class T, class Container = C_Vector<T>,
+//template <class T, class Container = std::vector<T>,
+	class Compare = std::less<T> >
+	class priority_queue {
+	protected:
+		Container c;
+		Compare comp;
+
+	public:
+		explicit priority_queue(const Container& c_ = Container(),
+			const Compare& comp_ = Compare())
+			: c(c_), comp(comp_)
+		{
+			std::make_heap(c.begin(), c.end(), comp);
+		}
+
+		bool empty() const { return c.empty(); }
+		std::size_t size() const { return c.size(); }
+
+		const T& top() { return c.front(); }
+
+		void push(const T& x) {
+			c.push_back(x);
+			std::push_heap(c.begin(), c.end(), comp);
+		}
+
+		void pop() {
+			std::pop_heap(c.begin(), c.end(), comp);
+			c.pop_back();
+		}
+};
+
+// Determine priority (in the priority queue)
+bool operator<(const node & a, const node & b) {
+	return a.getPriority() > b.getPriority();
+}
+
+// A-star algorithm.
+// The route returned is a string of direction digits.
+string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish, const int & yFinish) {
+
+	static priority_queue<node> pq[2]; // list of open (not-yet-tried) nodes
+	static int pqi; // pq index
+	static node* n0;
+	static node* m0;
+	static int i, j, x, y, xdx, ydy;
+	static char c;
+	pqi = 0;
+
+	// reset the node maps
+	for (y = 0; y<MAX_WIDTH; y++)
+	{
+		for (x = 0; x<MAX_HEIGHT; x++)
+		{
+			closed_nodes_map[x][y] = 0;
+			open_nodes_map[x][y] = 0;
+		}
+	}
+
+	// create the start node and push into list of open nodes
+	n0 = new node(xStart, yStart, 0, 0);
+	n0->updatePriority(xFinish, yFinish);
+	pq[pqi].push(*n0);
+	open_nodes_map[x][y] = n0->getPriority(); // mark it on the open nodes map
+
+	// A* search
+	while (!pq[pqi].empty())
+	{
+		// get the current node w/ the highest priority
+		// from the list of open nodes
+		n0 = new node(pq[pqi].top().getxPos(), pq[pqi].top().getyPos(),
+			pq[pqi].top().getLevel(), pq[pqi].top().getPriority());
+
+		x = n0->getxPos(); y = n0->getyPos();
+
+		pq[pqi].pop(); // remove the node from the open list
+		open_nodes_map[x][y] = 0;
+		// mark it on the closed nodes map
+		closed_nodes_map[x][y] = 1;
+
+		// quit searching when the goal state is reached
+		//if((*n0).estimate(xFinish, yFinish) == 0)
+		if (x == xFinish && y == yFinish)
+		{
+			// generate the path from finish to start
+			// by following the directions
+			string path = "";
+			while (!(x == xStart && y == yStart))
+			{
+				j = dir_map[x][y];
+				c = '0' + (j + dir / 2) % dir;
+				path = c + path;
+				x += dx[j];
+				y += dy[j];
+			}
+
+			// garbage collection
+			delete n0;
+			// empty the leftover nodes
+			while (!pq[pqi].empty()) pq[pqi].pop();
+
+			// print debug
+			int j; char c;
+			int x = xStart;
+			int y = yStart;
+
+			for (int i = 0; i<path.length(); i++)
+			{
+				c = path.at(i);
+				j = atoi(&c);
+				x = x + dx[j];
+				y = y + dy[j];
+				if (i == 0) {
+					printf("(%d, %d)", x, y);
+				}
+				else if (i == path.length() - 1) {
+					printf("\n");
+				}
+				else {
+					printf(" -> (%d, %d)", x, y);
+				}
+			}
+
+			return path;
+		}
+
+		// generate moves (child nodes) in all possible directions
+		for (i = 0; i<dir; i++)
+		{
+			xdx = x + dx[i];
+			ydy = y + dy[i];
+
+			if (canWalk(xdx, ydy) && closed_nodes_map[xdx][ydy] == 0)
+			{
+				// generate a child node
+				m0 = new node(xdx, ydy, n0->getLevel(),
+					n0->getPriority());
+				m0->nextLevel(i);
+				m0->updatePriority(xFinish, yFinish);
+
+				// if it is not in the open list then add into that
+				if (open_nodes_map[xdx][ydy] == 0)
+				{
+					open_nodes_map[xdx][ydy] = m0->getPriority();
+					pq[pqi].push(*m0);
+					// mark its parent node direction
+					dir_map[xdx][ydy] = (i + dir / 2) % dir;
+				}
+				else if (open_nodes_map[xdx][ydy]>m0->getPriority())
+				{
+					// update the priority info
+					open_nodes_map[xdx][ydy] = m0->getPriority();
+					// update the parent direction info
+					dir_map[xdx][ydy] = (i + dir / 2) % dir;
+
+					// replace the node
+					// by emptying one pq to the other one
+					// except the node to be replaced will be ignored
+					// and the new node will be pushed in instead
+					while (!(pq[pqi].top().getxPos() == xdx &&
+						pq[pqi].top().getyPos() == ydy))
+					{
+						pq[1 - pqi].push(pq[pqi].top());
+						pq[pqi].pop();
+					}
+					pq[pqi].pop(); // remove the wanted node
+
+					// empty the larger size pq to the smaller one
+					if (pq[pqi].size()>pq[1 - pqi].size()) pqi = 1 - pqi;
+					while (!pq[pqi].empty())
+					{
+						pq[1 - pqi].push(pq[pqi].top());
+						pq[pqi].pop();
+					}
+					pqi = 1 - pqi;
+					pq[pqi].push(*m0); // add the better node instead
+				}
+				else delete m0; // garbage collection
+			}
+		}
+		delete n0; // garbage collection
+	}
+	return ""; // no route found
+}
 
 class BspListener : public ITCODBspCallback {
 private:
@@ -42,7 +482,7 @@ public:
 };
 
 Map::Map(int width, int height)
-	: width(width), height(height) {
+	: width(width > MAX_WIDTH ? MAX_WIDTH : width), height(height > MAX_HEIGHT ? MAX_HEIGHT : height) {
 	seed = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
 }
 
@@ -50,7 +490,6 @@ Map::Map(const Map& otherMap)
 {
 	width = otherMap.width;
 	height = otherMap.height;
-
 	seed = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
 }
 

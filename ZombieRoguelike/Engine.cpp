@@ -132,37 +132,37 @@ Actor *Engine::getClosestMonster(int x, int y, float range) const {
 	return closest;
 }
 
-bool Engine::pickATile(int *x, int *y, float maxRange) {
-	while (!TCODConsole::isWindowClosed()) {
-		render();
-		// highlight the possible range
-		for (int cx = 0; cx < map->width; cx++) {
-			for (int cy = 0; cy < map->height; cy++) {
-				if (map->isInFov(cx, cy)
-					&& (maxRange == 0 || player->getDistance(cx, cy) <= maxRange)) {
-					TCODColor col = TCODConsole::root->getCharBackground(cx, cy);
-					col = col * 1.2f;
-					TCODConsole::root->setCharBackground(cx, cy, col);
-				}
-			}
-		}
-		TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
-		if (map->isInFov(mouse.cx, mouse.cy)
-			&& (maxRange == 0 || player->getDistance(mouse.cx, mouse.cy) <= maxRange)) {
-			TCODConsole::root->setCharBackground(mouse.cx, mouse.cy, TCODColor::white);
-			if (mouse.lbutton_pressed) {
-				*x = mouse.cx;
-				*y = mouse.cy;
-				return true;
-			}
-		}
-		if (mouse.rbutton_pressed || lastKey.vk != TCODK_NONE) {
-			return false;
-		}
-		TCODConsole::flush();
-	}
-	return false;
-}
+//bool Engine::pickATile(int *x, int *y, float maxRange) {
+//	while (!TCODConsole::isWindowClosed()) {
+//		render();
+//		// highlight the possible range
+//		for (int cx = 0; cx < map->width; cx++) {
+//			for (int cy = 0; cy < map->height; cy++) {
+//				if (map->isInFov(cx, cy)
+//					&& (maxRange == 0 || player->getDistance(cx, cy) <= maxRange)) {
+//					TCODColor col = TCODConsole::root->getCharBackground(cx, cy);
+//					col = col * 1.2f;
+//					TCODConsole::root->setCharBackground(cx, cy, col);
+//				}
+//			}
+//		}
+//		TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS | TCOD_EVENT_MOUSE, &lastKey, &mouse);
+//		if (map->isInFov(mouse.cx, mouse.cy)
+//			&& (maxRange == 0 || player->getDistance(mouse.cx, mouse.cy) <= maxRange)) {
+//			TCODConsole::root->setCharBackground(mouse.cx, mouse.cy, TCODColor::white);
+//			if (mouse.lbutton_pressed) {
+//				*x = mouse.cx;
+//				*y = mouse.cy;
+//				return true;
+//			}
+//		}
+//		if (mouse.rbutton_pressed || lastKey.vk != TCODK_NONE) {
+//			return false;
+//		}
+//		TCODConsole::flush();
+//	}
+//	return false;
+//}
 
 void Engine::nextLevel() {
 	level++;
@@ -184,25 +184,6 @@ void Engine::nextLevel() {
 	map = next;
 	map->init(true);
 	gameStatus = STARTUP;
-
-	// create a new map
-	//Map *map1 = new Map(100, 43);
-	//Map *map2 = new Map(150, 43);
-
-	//map2 = map1;
-
-	//if (level < 2)
-	//{
-		/*map = new Map(80, 43);
-		map->init(true);
-		gameStatus = STARTUP;*/
-	//}
-	//else
-	//{
-	//	map = new Map(*map2);
-	//	map->init(true);
-	//	gameStatus = STARTUP;
-	//}
 }
 
 TEST_CASE("Engine", "[init]") {
