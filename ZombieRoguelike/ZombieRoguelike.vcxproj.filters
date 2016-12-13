@@ -63,6 +63,9 @@
     <ClInclude Include="Describer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="C_Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

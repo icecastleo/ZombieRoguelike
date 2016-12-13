@@ -161,6 +161,7 @@
     <ClInclude Include="Ai.h" />
     <ClInclude Include="Attacker.h" />
     <ClInclude Include="Container.h" />
+    <ClInclude Include="C_Vector.h" />
     <ClInclude Include="Describer.h" />
     <ClInclude Include="Destructible.h" />
     <ClInclude Include="Engine.h" />
