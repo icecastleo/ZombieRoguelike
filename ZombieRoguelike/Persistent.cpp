@@ -257,18 +257,26 @@ void Engine::load(bool pause) {
 
 	Menu::MenuItemCode menuItem = engine.gui->menu.pick(
 		pause ? Menu::PAUSE : Menu::MAIN);
+
 	if (menuItem == Menu::EXIT || menuItem == Menu::NONE) {
 		// Exit or window closed
 		exit(0);
 	}
 	else if (menuItem == Menu::NEW_GAME) {
 		// New game
-		engine.term();
+		if (pause) {
+			engine.term();
+		}
+
 		engine.init();
 	}
 	else {
 		// continue a saved game
-		engine.term();
+		if (pause) {
+			return;
+		}
+		//engine.term();
+
 		// load the map
 		level = zip.getInt();
 		int width = zip.getInt();

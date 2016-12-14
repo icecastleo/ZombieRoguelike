@@ -3,6 +3,27 @@
 #include <math.h>
 #include <sstream>
 
+class Player : public Actor {
+	static Player *instance;
+
+	Player() : Actor(40, 25, '@', "player", TCODColor::white)
+	{
+		describer = new PlayerDescriber();
+		destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
+		attacker = new Attacker(5);
+		ai = new PlayerAi();
+		container = new Container(26);
+	}
+public:
+	static Player *getInstance()
+	{
+		if (!instance)
+			instance = new Player();
+		return instance;
+	}
+};
+
+
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
 screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
@@ -11,13 +32,14 @@ screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
 }
 
 void Engine::init() {
-	player = new Actor(40, 25, '@', "player", TCODColor::white);
+	/*player = new Actor(40, 25, '@', "player", TCODColor::white);
 	player->describer = new PlayerDescriber();
 	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
-	player->container = new Container(26);
-	actors.push(player);
+	player->container = new Container(26);*/
+
+	actors.push(Player::getInstance());
 	stairs = new Actor(0, 0, '>', "stairs", TCODColor::white);
 	stairs->blocks = false;
 	stairs->fovOnly = false;
@@ -27,9 +49,9 @@ void Engine::init() {
 	map->init(true);
 
 #ifdef _WIN64
-	engine.gui->message(TCODColor::yellow, "This is a 64-bit program!!");
+	gui->message(TCODColor::yellow, "This is a 64-bit program!!");
 #else
-	engine.gui->message(TCODColor::yellow, "This is a 32-bit program!!");
+	gui->message(TCODColor::yellow, "This is a 32-bit program!!");
 #endif
 
 	gui->message(TCODColor::red,
@@ -38,7 +60,7 @@ void Engine::init() {
 	// print out player
 	std::stringstream ss;
 	ss << *player;
-	engine.gui->message(TCODColor::lightGrey, ss.str().c_str());
+	gui->message(TCODColor::lightGrey, ss.str().c_str());
 
 	gameStatus = STARTUP;
 }
