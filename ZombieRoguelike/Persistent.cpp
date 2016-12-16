@@ -288,7 +288,9 @@ void Engine::load(bool pause) {
 		m_level = zip.getInt();
 		int width = zip.getInt();
 		int height = zip.getInt();
-		map = new Map(width, height);
+
+		map = std::unique_ptr<Map>(new Map(width, height));
+		//map = new Map(width, height);
 		map->load(zip);
 		// then the player
 		player = new Actor(0, 0, 0, NULL, TCODColor::white);

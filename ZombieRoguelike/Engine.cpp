@@ -2,17 +2,16 @@
 #include "main.h"
 #include <math.h>
 #include <sstream>
+#include <thread> 
 
-Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
-player(NULL), map(NULL), fovRadius(10),
+Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP), fovRadius(10),
 screenWidth(screenWidth), screenHeight(screenHeight), m_level(1) {
 	TCODConsole::initRoot(screenWidth, screenHeight, "Zombie Roguelike", false);
 	gui = new Gui();
 	registerObserver((EngineObserver *)gui);
 }
 
-void Engine::init() {
-	
+void Engine::init() {	
 	player = new Actor(40, 25, '@', "player", TCODColor::white);
 	player->describer = new PlayerDescriber();
 	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
@@ -26,7 +25,8 @@ void Engine::init() {
 	stairs->fovOnly = false;
 	actors.push(stairs);
 
-	map = new Map(80, 43);
+	map = std::unique_ptr<Map>(new Map(80, 43));
+	//map = new Map(80, 43);
 	map->init(true);
 
 #ifdef _WIN64
@@ -53,7 +53,9 @@ Engine::~Engine() {
 
 void Engine::term() {
 	actors.clearAndDelete();
-	if (map) delete map;
+	if (map)
+		map.reset();
+		//delete map;
 	gui->clear();
 }
 
@@ -71,12 +73,28 @@ void Engine::update() {
 	player->update();
 
 	if (gameStatus == NEW_TURN) {
-		for (Actor **iterator = actors.begin(); iterator != actors.end();
+		int half = (actors.end() - actors.begin()) / 2;
+		std::thread t1(&Engine::updateRange, this, actors.begin(), actors.begin() + half);
+		std::thread t2(&Engine::updateRange, this, actors.begin() + half, actors.end());
+
+		t1.join();
+		t2.join();
+
+		/*for (Actor **iterator = actors.begin(); iterator != actors.end();
 			iterator++) {
 			Actor *actor = *iterator;
 			if (actor != player) {
 				actor->update();
 			}
+		}*/
+	}
+}
+
+void Engine::updateRange(Actor **begin, Actor **end) {
+	for (; begin != end; begin++) {
+		Actor *actor = *begin;
+		if (actor != player) {
+			actor->update();
 		}
 	}
 }
@@ -174,8 +192,8 @@ void Engine::nextLevel() {
 	player->destructible->heal(player->destructible->maxHp / 2);
 	gui->message(TCODColor::red, "After a rare moment of peace, you descend\ndeeper into the heart of the dungeon...");
 
-	Map *next = map->nextMap();
-	delete map;
+	//Map *next = map->nextMap();
+	//delete map;
 
 	// delete all actors but player and stairs
 	for (Actor **it = actors.begin(); it != actors.end(); it++) {
@@ -185,7 +203,9 @@ void Engine::nextLevel() {
 		}
 	}
 
-	map = next;
+	map = std::move(std::unique_ptr<Map>(map->nextMap()));
+	//map = next;
+
 	map->init(true);
 	gameStatus = STARTUP;
 }

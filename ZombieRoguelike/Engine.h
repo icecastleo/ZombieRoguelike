@@ -23,7 +23,7 @@ public:
 	TCODList<Actor *> actors;
 	Actor *player;
 	Actor *stairs;
-	Map *map;
+	std::unique_ptr<Map> map;
 	int fovRadius;
 	int screenWidth;
 	int screenHeight;
@@ -32,6 +32,7 @@ public:
 	Engine(int screenWidth, int screenHeight);
 	~Engine();
 	void update();
+	void updateRange(Actor ** begin, Actor ** end);
 	void render();
 	void sendToBack(Actor *actor);
 	Actor *getActor(int x, int y) const;
