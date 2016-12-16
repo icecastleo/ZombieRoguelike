@@ -156,35 +156,12 @@ int PlayerAi::getNextLevelXp() {
 }
 
 void PlayerAi::update(Actor *owner) {
-	int levelUpXp = getNextLevelXp();
-	if (owner->destructible->xp >= levelUpXp) {
-		xpLevel++;
-		owner->destructible->xp -= levelUpXp;
-		owner->destructible->heal();
-		engine.gui->message(TCODColor::yellow, "You reached level %d! \nYou feel healthy and your battle skills grow stronger!", xpLevel);
-		
-		engine.gui->menu.clear();
-		engine.gui->menu.addItem(Menu::CONSTITUTION, "Constitution (+20HP)");
-		engine.gui->menu.addItem(Menu::STRENGTH, "Strength (+1 attack)");
-		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 defense)");
-		Menu::MenuItemCode menuItem = engine.gui->menu.pick(Menu::PAUSE);
-		switch (menuItem) {
-		case Menu::CONSTITUTION:
-			owner->destructible->maxHp += 20;
-			owner->destructible->hp += 20;
-			break;
-		case Menu::STRENGTH:
-			owner->attacker->power += 1;
-			break;
-		case Menu::AGILITY:
-			owner->destructible->defense += 1;
-			break;
-		default:break;
-		}
-	}
+	
 	if (owner->destructible && owner->destructible->isDead()) {
 		return;
 	}
+
+	checkExperience(owner);
 
 	int dx = 0, dy = 0;
 
@@ -240,56 +217,41 @@ void PlayerAi::update(Actor *owner) {
 		}
 	}
 
-	//if (!path.empty()) {
-	//	char c = path.at(0);
-	//	int j = atoi(&c);
-	//	dx = dxx[j];
-	//	dy = dyy[j];
-
-	//	path.erase(0, 1);
-	//}
-
-	//if (!path.empty()) {
-	//	char c; int j;
-	//	int x = owner->x;
-	//	int y = owner->y;
-	//	
-	//	// clear the Path console
-	//	con->setDefaultBackground(TCODColor::black);
-	//	con->clear();
-
-	//	for (int i = 0; i<path.length(); i++)
-	//	{
-	//		c = path.at(i);
-	//		j = atoi(&c);
-	//		x = x + dxx[j];
-	//		y = y + dyy[j];
-
-	//		TCODConsole::root->setChar(x, y, '#');
-	//		con->setCharForeground(x, y, TCODColor::white);
-
-	//		if (i == 0) {
-	//			printf("(%d, %d)", x, y);
-	//		}
-	//		else if (i == path.length() - 1) {
-	//			printf("\n");
-	//			//TCODConsole::root->clear();
-	//			//con->clear();
-	//		}
-	//		else {
-	//			printf(" -> (%d, %d)", x, y);
-	//		}
-	//	}
-
-	//	TCODConsole::blit(con, 0, 0, engine.screenWidth, engine.screenHeight,
-	//		TCODConsole::root, 0, 0);
-	//	//engine.screenWidth / 2, engine.screenHeight / 2
-	//}
-
 	if (dx != 0 || dy != 0) {
 		engine.gameStatus = Engine::NEW_TURN;
 		if (moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
 			engine.map->computeFov();
+		}
+	}
+}
+
+void PlayerAi::checkExperience(Actor *owner) {
+	int levelUpXp = getNextLevelXp();
+
+	if (owner->destructible->xp >= levelUpXp) {
+		xpLevel++;
+		owner->destructible->xp -= levelUpXp;
+		owner->destructible->heal();
+		engine.gui->message(TCODColor::yellow, "You reached level %d! \nYou feel healthy and your battle skills grow stronger!", xpLevel);
+
+		engine.gui->menu.clear();
+		engine.gui->menu.addItem(Menu::CONSTITUTION, "Constitution (+20HP)");
+		engine.gui->menu.addItem(Menu::STRENGTH, "Strength (+1 attack)");
+		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 defense)");
+
+		Menu::MenuItemCode menuItem = engine.gui->menu.pick(Menu::PAUSE);
+		switch (menuItem) {
+		case Menu::CONSTITUTION:
+			owner->destructible->maxHp += 20;
+			owner->destructible->hp += 20;
+			break;
+		case Menu::STRENGTH:
+			owner->attacker->power += 1;
+			break;
+		case Menu::AGILITY:
+			owner->destructible->defense += 1;
+			break;
+		default:break;
 		}
 	}
 }
@@ -444,13 +406,16 @@ Actor *PlayerAi::choseFromInventory(Actor *owner) {
 	con.setDefaultForeground(TCODColor::white);
 	int shortcut = 'a';
 	int y = 1;
-	for (Actor **it = owner->container->inventory.begin();
-		it != owner->container->inventory.end(); it++) {
-		Actor *actor = *it;
-		con.print(2, y, "(%c) %s", shortcut, actor->getName());
-		y++;
-		shortcut++;
-	}
+
+	std::for_each(owner->container->inventory.begin(), owner->container->inventory.end(), [&y, &shortcut](Actor *actor) {
+		con.print(2, y++, "(%c) %s", shortcut++, actor->getName());
+	});
+
+	//for (Actor *actor : owner->container->inventory) {
+	//	con.print(2, y, "(%c) %s", shortcut, actor->getName());
+	//	y++;
+	//	shortcut++;
+	//}
 
 	// blit the inventory console on the root console
 	TCODConsole::blit(&con, 0, 0, INVENTORY_WIDTH, INVENTORY_HEIGHT,
@@ -464,7 +429,7 @@ Actor *PlayerAi::choseFromInventory(Actor *owner) {
 	if (key.vk == TCODK_CHAR) {
 		int actorIndex = key.c - 'a';
 		if (actorIndex >= 0 && actorIndex < owner->container->inventory.size()) {
-			return owner->container->inventory.get(actorIndex);
+			return owner->container->inventory.at(actorIndex);
 		}
 	}
 	return NULL;

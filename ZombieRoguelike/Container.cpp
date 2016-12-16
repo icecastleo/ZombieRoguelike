@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "main.h"
+#include <algorithm>
+
 
 Container::Container(int size) : size(size) {
 }
 
 Container::~Container() {
-	inventory.clearAndDelete();
+	inventory.clear();
 }
 
 bool Container::add(Actor *actor) {
@@ -13,10 +15,10 @@ bool Container::add(Actor *actor) {
 		// inventory full
 		return false;
 	}
-	inventory.push(actor);
+	inventory.push_back(actor);
 	return true;
 }
 
 void Container::remove(Actor *actor) {
-	inventory.remove(actor);
+	inventory.erase(std::remove(inventory.begin(), inventory.end(), actor), inventory.end());
 }

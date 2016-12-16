@@ -1,8 +1,12 @@
 #pragma once
-class Pickable {
+class Pickable : public Persistent {
 public:
 	bool pick(Actor *owner, Actor *wearer);
 	void drop(Actor *owner, Actor *wearer);
+
+	void load(TCODZip &zip) {}
+	void save(TCODZip &zip) {}
+
 	//static Pickable *create(TCODZip &zip);
 //protected:
 //	enum PickableType {

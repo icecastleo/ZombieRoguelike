@@ -26,7 +26,7 @@ protected:
 	TCODList<MenuItem *> items;
 };
 
-class Gui : public Persistent {
+class Gui : public Persistent, EngineObserver {
 public:
 	Menu menu;
 
@@ -51,4 +51,7 @@ protected:
 		float value, float maxValue, const TCODColor &barColor,
 		const TCODColor &backColor);
 	void renderMouseLook();
+
+	int m_level;
+	virtual void updateLevel(int level);
 };

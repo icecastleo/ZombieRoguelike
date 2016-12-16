@@ -1,8 +1,10 @@
 #pragma once
+#include <vector>
+
 class Container : public Persistent {
 public:
 	int size; // maximum number of actors. 0=unlimited
-	TCODList<Actor *> inventory;
+	std::vector<Actor *> inventory;
 
 	Container(int size);
 	~Container();

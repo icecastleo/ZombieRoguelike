@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #define CATCH_CONFIG_RUNNER
-
 #include "main.h"
 #include <Windows.h>
 #include <iostream>
@@ -39,9 +38,8 @@ int main(int argc, char* const argv[])
 		std::chrono::duration<double, std::milli> elapsed = current - previous;
 		previous = current;
 		lag += elapsed.count();
-
-		std::cout << lag << std::endl;
-
+		//std::cout << lag << std::endl;
+		
 		while (lag >= MS_PER_UPDATE)
 		{
 			engine.update();

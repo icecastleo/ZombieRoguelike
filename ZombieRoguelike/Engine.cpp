@@ -3,43 +3,24 @@
 #include <math.h>
 #include <sstream>
 
-class Player : public Actor {
-	static Player *instance;
-
-	Player() : Actor(40, 25, '@', "player", TCODColor::white)
-	{
-		describer = new PlayerDescriber();
-		destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
-		attacker = new Attacker(5);
-		ai = new PlayerAi();
-		container = new Container(26);
-	}
-public:
-	static Player *getInstance()
-	{
-		if (!instance)
-			instance = new Player();
-		return instance;
-	}
-};
-
-
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP),
 player(NULL), map(NULL), fovRadius(10),
-screenWidth(screenWidth), screenHeight(screenHeight), level(1) {
+screenWidth(screenWidth), screenHeight(screenHeight), m_level(1) {
 	TCODConsole::initRoot(screenWidth, screenHeight, "Zombie Roguelike", false);
 	gui = new Gui();
+	registerObserver((EngineObserver *)gui);
 }
 
 void Engine::init() {
-	/*player = new Actor(40, 25, '@', "player", TCODColor::white);
+	
+	player = new Actor(40, 25, '@', "player", TCODColor::white);
 	player->describer = new PlayerDescriber();
 	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
-	player->container = new Container(26);*/
+	player->container = new Container(26);
+	actors.push(player);
 
-	actors.push(Player::getInstance());
 	stairs = new Actor(0, 0, '>', "stairs", TCODColor::white);
 	stairs->blocks = false;
 	stairs->fovOnly = false;
@@ -187,7 +168,8 @@ Actor *Engine::getClosestMonster(int x, int y, float range) const {
 //}
 
 void Engine::nextLevel() {
-	level++;
+	setLevel(m_level+1);
+
 	gui->message(TCODColor::lightViolet, "You take a moment to rest, and recover your strength.");
 	player->destructible->heal(player->destructible->maxHp / 2);
 	gui->message(TCODColor::red, "After a rare moment of peace, you descend\ndeeper into the heart of the dungeon...");

@@ -28,6 +28,7 @@ void Actor::load(TCODZip &zip) {
 	bool hasDestructible = zip.getInt();
 	bool hasAi = zip.getInt();
 	bool hasPickable = zip.getInt();
+	bool hasUsable = zip.getInt();
 	bool hasContainer = zip.getInt();
 	if (hasAttacker) {
 		attacker = new Attacker(0.0f);
@@ -41,6 +42,11 @@ void Actor::load(TCODZip &zip) {
 	}
 	if (hasPickable) {
 		pickable = new Pickable();
+	}
+	if (hasUsable) {
+		// FIXME: Save like AI
+		usable = new Healer(0);
+		usable->load(zip);
 	}
 	if (hasContainer) {
 		container = new Container(0);
@@ -60,11 +66,13 @@ void Actor::save(TCODZip &zip) {
 	zip.putInt(destructible != NULL);
 	zip.putInt(ai != NULL);
 	zip.putInt(pickable != NULL);
+	zip.putInt(usable != NULL);
 	zip.putInt(container != NULL);
 	if (attacker) attacker->save(zip);
 	if (destructible) destructible->save(zip);
 	if (ai) ai->save(zip);
-	//if (pickable) pickable->save(zip);
+	if (pickable) pickable->save(zip);
+	if (usable) usable->save(zip);
 	if (container) container->save(zip);
 }
 
@@ -74,7 +82,7 @@ void Container::load(TCODZip &zip) {
 	while (nbActors > 0) {
 		Actor *actor = new Actor(0, 0, 0, NULL, TCODColor::white);
 		actor->load(zip);
-		inventory.push(actor);
+		inventory.push_back(actor);
 		nbActors--;
 	}
 }
@@ -82,8 +90,8 @@ void Container::load(TCODZip &zip) {
 void Container::save(TCODZip &zip) {
 	zip.putInt(size);
 	zip.putInt(inventory.size());
-	for (Actor **it = inventory.begin(); it != inventory.end(); it++) {
-		(*it)->save(zip);
+	for (Actor *it : inventory) {
+		it->save(zip);
 	}
 }
 
@@ -173,14 +181,13 @@ Ai *Ai::create(TCODZip &zip) {
 	return ai;
 }
 
-//void Healer::load(TCODZip &zip) {
-//	amount = zip.getFloat();
-//}
-//
-//void Healer::save(TCODZip &zip) {
-//	zip.putInt(HEALER);
-//	zip.putFloat(amount);
-//}
+void Healer::load(TCODZip &zip) {
+	amount = zip.getFloat();
+}
+
+void Healer::save(TCODZip &zip) {
+	zip.putFloat(amount);
+}
 
 //void LightningBolt::load(TCODZip &zip) {
 //	range = zip.getFloat();
@@ -278,7 +285,7 @@ void Engine::load(bool pause) {
 		//engine.term();
 
 		// load the map
-		level = zip.getInt();
+		m_level = zip.getInt();
 		int width = zip.getInt();
 		int height = zip.getInt();
 		map = new Map(width, height);
@@ -313,7 +320,7 @@ void Engine::save() {
 	else {
 		TCODZip zip;
 		zip.putInt(SAVEGAME_VERSION);
-		zip.putInt(level);
+		zip.putInt(m_level);
 		// save the map first
 		zip.putInt(map->width);
 		zip.putInt(map->height);

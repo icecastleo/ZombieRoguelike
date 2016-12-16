@@ -1,4 +1,14 @@
 #pragma once
+#include <vector>
+
+class EngineObserver
+{
+public:
+	virtual void updateLevel(int level) = 0;
+};
+
+class Gui;
+
 class Engine {
 public:
 	enum GameStatus {
@@ -18,7 +28,6 @@ public:
 	int screenWidth;
 	int screenHeight;
 	Gui *gui;
-	int level;
 
 	Engine(int screenWidth, int screenHeight);
 	~Engine();
@@ -33,6 +42,29 @@ public:
 	void save();
 	void init();
 	void term();
+
+	void setLevel(int level) {
+		m_level = level;
+		notifyAll();
+	}
+
+	void registerObserver(EngineObserver *obs) {
+		m_level_views.push_back(obs);
+		notify(obs);
+	}
+
+protected:
+	int m_level;
+	std::vector<EngineObserver *> m_level_views;
+
+	void notifyAll() {
+		for (int i = 0; i < m_level_views.size(); ++i)
+			notify(m_level_views[i]);
+	}
+
+	void notify(EngineObserver *obs) {
+		obs->updateLevel(m_level);
+	}
 };
 
 extern Engine engine;

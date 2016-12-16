@@ -22,6 +22,10 @@ Gui::~Gui() {
 	clear();
 }
 
+void Gui::updateLevel(int level) {
+	m_level = level;
+}
+
 void Gui::clear() {
 	log.clearAndDelete();
 }
@@ -62,7 +66,7 @@ void Gui::render() {
 
 	// dungeon level
 	con->setDefaultForeground(TCODColor::white);
-	con->print(3, 3, "Dungeon level %d", engine.level);
+	con->print(3, 3, "Dungeon level %d", m_level);
 
 	// blit the GUI console on the root console
 	TCODConsole::blit(con, 0, 0, engine.screenWidth, PANEL_HEIGHT,

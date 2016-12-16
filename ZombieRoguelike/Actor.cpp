@@ -109,3 +109,59 @@ float Actor::getDistance(int cx, int cy) const {
 std::ostream & operator<<(std::ostream &stream, const Actor &actor) {
 	return stream << "Actor - " << actor.name <<" is represent as '" << actor.ch << "'" << " at " << actor.x << "," << actor.y;
 }
+
+ActorFactory * ActorFactory::getInstance() {
+	static ActorFactory *instance;
+
+	if (!instance)
+		instance = new ActorFactory();
+	return instance;
+}
+
+Actor * ActorFactory::makeMonster(char c) {
+	Actor *actor;
+	
+	switch (c)
+	{
+	case 'z':
+		// create an zombie
+		actor = new Actor(0, 0, 'z', "Zombie",
+			TCODColor::desaturatedGreen);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
+		actor->attacker = new Attacker(3);
+		actor->ai = new MonsterAi();
+		return actor;
+
+	case 'Z':
+		// create a fleshy zombie
+		actor = new Actor(0, 0, 'Z', "Fleshy Zombie",
+			TCODColor::darkerGreen);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
+		actor->attacker = new Attacker(4);
+		actor->ai = new MonsterAi();
+		return actor;
+
+	case 'D':
+		actor = new Actor(0, 0, 'D', "Duplicated Zombie",
+			TCODColor::darkerGreen);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(12, 0, "Duplicated zombie debris", 75);
+		actor->attacker = new Attacker(3);
+		actor->ai = new DuplicateAi();
+		return actor;
+
+	case 'T':
+		actor = new Actor(0, 0, 'T', "Teleport Zombie",
+			TCODColor::darkerGreen);
+		actor->describer = new MonsterDescriber();
+		actor->destructible = new MonsterDestructible(20, 0, "Teleport zombie debris", 150);
+		actor->attacker = new Attacker(5);
+		actor->ai = new TeleportAi();
+		return actor;
+
+	default:
+		return nullptr;
+	}
+}

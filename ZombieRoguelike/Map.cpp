@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "main.h"
-#include "C_Vector.h"
-//using std::priority_queue;
+//#include "C_Vector.h"
+#include <queue>
 
 static const int ROOM_MAX_SIZE = 12;
 static const int ROOM_MIN_SIZE = 6;
@@ -74,37 +74,37 @@ public:
 	}
 };
 
-template <class T, class Container = C_Vector<T>,
-//template <class T, class Container = std::vector<T>,
-	class Compare = std::less<T> >
-	class priority_queue {
-	protected:
-		Container c;
-		Compare comp;
-
-	public:
-		explicit priority_queue(const Container& c_ = Container(),
-			const Compare& comp_ = Compare())
-			: c(c_), comp(comp_)
-		{
-			std::make_heap(c.begin(), c.end(), comp);
-		}
-
-		bool empty() const { return c.empty(); }
-		std::size_t size() const { return c.size(); }
-
-		const T& top() const { return c.front(); }
-
-		void push(const T& x) {
-			c.push_back(x);
-			std::push_heap(c.begin(), c.end(), comp);
-		}
-
-		void pop() {
-			std::pop_heap(c.begin(), c.end(), comp);
-			c.pop_back();
-		}
-};
+//template <class T, class Container = C_Vector<T>,
+////template <class T, class Container = std::vector<T>,
+//	class Compare = std::less<T> >
+//	class priority_queue {
+//	protected:
+//		Container c;
+//		Compare comp;
+//
+//	public:
+//		explicit priority_queue(const Container& c_ = Container(),
+//			const Compare& comp_ = Compare())
+//			: c(c_), comp(comp_)
+//		{
+//			std::make_heap(c.begin(), c.end(), comp);
+//		}
+//
+//		bool empty() const { return c.empty(); }
+//		std::size_t size() const { return c.size(); }
+//
+//		const T& top() const { return c.front(); }
+//
+//		void push(const T& x) {
+//			c.push_back(x);
+//			std::push_heap(c.begin(), c.end(), comp);
+//		}
+//
+//		void pop() {
+//			std::pop_heap(c.begin(), c.end(), comp);
+//			c.pop_back();
+//		}
+//};
 
 // Determine priority (in the priority queue)
 bool operator<(const node & a, const node & b) {
@@ -114,8 +114,7 @@ bool operator<(const node & a, const node & b) {
 // A-star algorithm.
 // The route returned is a string of direction digits.
 string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish, const int & yFinish) {
-
-	static priority_queue<node> pq[2]; // list of open (not-yet-tried) nodes
+	static std::priority_queue<node> pq[2]; // list of open (not-yet-tried) nodes
 	static int pqi; // pq index
 	static node* n0;
 	static node* m0;
@@ -376,58 +375,10 @@ Map* Map::nextMap()
 }
 
 void Map::addMonster(int x, int y, char c) {
-	TCODRandom *rng = TCODRandom::getInstance();
-	//int dice = rng->getInt(0, 100);
-
-	Actor *actor;
-
-	switch (c)
-	{
-	case 'z': 
-		// create an zombie
-		actor = new Actor(x, y, 'z', "Zombie",
-			TCODColor::desaturatedGreen);
-		actor->describer = new MonsterDescriber();
-		actor->destructible = new MonsterDestructible(10, 0, "zombie debris", 35);
-		actor->attacker = new Attacker(3);
-		actor->ai = new MonsterAi();
-		engine.actors.push(actor);
-		break;
-
-	case 'Z': 
-		// create a fleshy zombie
-		actor = new Actor(x, y, 'Z', "Fleshy Zombie",
-			TCODColor::darkerGreen);
-		actor->describer = new MonsterDescriber();
-		actor->destructible = new MonsterDestructible(16, 1, "fleshy zombie debris", 100);
-		actor->attacker = new Attacker(4);
-		actor->ai = new MonsterAi();
-		engine.actors.push(actor);
-		break;
-	
-	case 'D':
-		actor = new Actor(x, y, 'D', "Duplicated Zombie",
-			TCODColor::darkerGreen);
-		actor->describer = new MonsterDescriber();
-		actor->destructible = new MonsterDestructible(12, 0, "Duplicated zombie debris", 75);
-		actor->attacker = new Attacker(3);
-		actor->ai = new DuplicateAi();
-		engine.actors.push(actor);
-		break;
-
-	case 'T':
-		actor = new Actor(x, y, 'T', "Teleport Zombie",
-			TCODColor::darkerGreen);
-		actor->describer = new MonsterDescriber();
-		actor->destructible = new MonsterDestructible(20, 0, "Teleport zombie debris", 150);
-		actor->attacker = new Attacker(5);
-		actor->ai = new TeleportAi();
-		engine.actors.push(actor);
-		break;
-
-	default:
-		break;
-	}
+	Actor *actor = ActorFactory::getInstance()->makeMonster(c);
+	actor->x = x;
+	actor->y = y;
+	engine.actors.push(actor);
 }
 
 void Map::addItem(int x, int y) {

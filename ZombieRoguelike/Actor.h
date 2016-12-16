@@ -19,8 +19,7 @@ public:
 	Actor(int x, int y, char ch, const char *name, const TCODColor &col);
 	Actor(const Actor &other);  // copy constructor
 	Actor(Actor&& other);
-	Actor & operator=(Actor other);
-	//Actor& operator=(const Actor& other); // assign operator
+	Actor & operator=(Actor other); // assign operator
 	~Actor();
 
 	const char *getName() const;
@@ -45,5 +44,15 @@ private:
 	TCODColor col; // color
 };
 
+class ActorFactory {
+public:
+	static ActorFactory *getInstance();
+	Actor *makeMonster(char c);
+private:
+	ActorFactory() = default;
+	ActorFactory(const ActorFactory&) = delete;
+	const ActorFactory& operator=(const ActorFactory&) = delete;
+	~ActorFactory() = default;
+};
 
 
