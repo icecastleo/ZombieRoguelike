@@ -54,5 +54,3 @@ private:
 	const ActorFactory& operator=(const ActorFactory&) = delete;
 	~ActorFactory() = default;
 };
-
-

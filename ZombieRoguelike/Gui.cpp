@@ -22,8 +22,8 @@ Gui::~Gui() {
 	clear();
 }
 
-void Gui::updateLevel(int level) {
-	m_level = level;
+void Gui::updateEngine (const Engine *engine)  {
+	m_level = engine->getLevel();
 }
 
 void Gui::clear() {

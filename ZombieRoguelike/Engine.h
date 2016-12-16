@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
 
+class Gui;
+class Engine;
+
 class EngineObserver
 {
 public:
-	virtual void updateLevel(int level) = 0;
+	virtual void updateEngine(const Engine *engine) = 0;
 };
-
-class Gui;
 
 class Engine {
 public:
@@ -49,6 +50,10 @@ public:
 		notifyAll();
 	}
 
+	int getLevel() const {
+		return m_level;
+	}
+
 	void registerObserver(EngineObserver *obs) {
 		m_level_views.push_back(obs);
 		notify(obs);
@@ -64,7 +69,7 @@ protected:
 	}
 
 	void notify(EngineObserver *obs) {
-		obs->updateLevel(m_level);
+		obs->updateEngine(this);
 	}
 };
 

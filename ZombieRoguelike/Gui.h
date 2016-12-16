@@ -53,5 +53,5 @@ protected:
 	void renderMouseLook();
 
 	int m_level;
-	virtual void updateLevel(int level);
+	virtual void updateEngine(const Engine *engine) override;
 };
