@@ -71,6 +71,9 @@ protected:
 	void notify(EngineObserver *obs) {
 		obs->updateEngine(this);
 	}
+
+private:
+	bt1::Behavior* getPlayerBehavior(PlayerAi *ai);
 };
 
 extern Engine engine;

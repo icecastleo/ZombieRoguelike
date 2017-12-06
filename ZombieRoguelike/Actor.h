@@ -11,6 +11,8 @@ public:
 	Attacker *attacker; // something that deals damages
 	Destructible *destructible; // something that can be damaged
 	Ai *ai; // something self-updating
+	bt1::Behavior *behavior;
+
 	Pickable *pickable; // something that can be picked and used
 	Usable *usable; // something that can be used
 	Container *container; // something that can contain actors

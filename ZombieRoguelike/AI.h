@@ -48,6 +48,8 @@ protected:
 
 class PlayerAi : public Ai {
 public:
+	int dx, dy;
+
 	int xpLevel;
 	PlayerAi();
 	Ai* copy() override;
@@ -58,6 +60,8 @@ public:
 
 	std::string path;
 	void render(const Actor *owner) const;
+
+	bt1::Behavior *behavior;
 
 protected:
 	bool moveOrAttack(Actor *owner, int targetx, int targety);

@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <math.h>
-#include "main.h"
-#include <string>;
+#include <string>
+#include "Main.h"
 
 using std::string;
+using namespace bt1;
 
 // how many turns the monster chases the player
 // after losing his sight
@@ -143,7 +144,7 @@ static int dyy[dir]={0, 1, 0, -1};
 //static int dxx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 //static int dyy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 
-PlayerAi::PlayerAi() : xpLevel(1) {
+PlayerAi::PlayerAi() : xpLevel(1), dx(0), dy(0) {
 	con = new TCODConsole(engine.screenWidth, engine.screenHeight);
 }
 
@@ -163,7 +164,7 @@ void PlayerAi::update(Actor *owner) {
 
 	checkExperience(owner);
 
-	int dx = 0, dy = 0;
+	//int dx = 0, dy = 0;
 
 	if (engine.mouse.rbutton_pressed) {
 		if (engine.map->isExplored(engine.mouse.cx, engine.mouse.cy)) {
@@ -222,6 +223,9 @@ void PlayerAi::update(Actor *owner) {
 		if (moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
 			engine.map->computeFov();
 		}
+
+		dx = 0;
+		dy = 0;
 	}
 }
 
@@ -269,7 +273,6 @@ void PlayerAi::render(const Actor *owner) const {
 			x = x + dxx[j];
 			y = y + dyy[j];
 
-			//TCODConsole::root->setChar(x, y, '#');
 			TCODConsole::root->setCharBackground(x, y, TCODColor::grey);
 
 			//if (i == 0) {

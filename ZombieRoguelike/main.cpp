@@ -5,8 +5,6 @@
 #include <iostream>
 #include <chrono>
 
-#define MS_PER_UPDATE 16
-
 using namespace std::chrono;
 
 Engine engine(100, 50);

@@ -4,11 +4,48 @@
 #include <sstream>
 #include <thread> 
 
+using namespace bt1;
+
 Engine::Engine(int screenWidth, int screenHeight) : gameStatus(STARTUP), fovRadius(10),
 screenWidth(screenWidth), screenHeight(screenHeight), m_level(1) {
 	TCODConsole::initRoot(screenWidth, screenHeight, "Zombie Roguelike", false);
 	gui = new Gui();
 	registerObserver((EngineObserver *)gui);
+}
+
+class RandomMove : public Behavior {
+
+public:
+	RandomMove(Actor *actor)
+		:actor(actor) {}
+
+protected:
+	Actor *actor;
+
+	virtual Status update() {
+		//if (dx != 0 || dy != 0) {
+		//	engine.gameStatus = Engine::NEW_TURN;
+		//	
+		//	if (moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
+		//		engine.map->computeFov();
+		//	}
+		//}
+
+
+	}
+};
+
+Behavior* Engine::getPlayerBehavior(PlayerAi *ai) {
+
+	Sequence *seq = new Sequence();
+	seq->addChild(new Wait(1000));
+
+	seq->addChild(new SimpleAction([=]() {
+		ai->dx = 1;
+		ai->dy = 1;
+	}));
+	
+	return seq;
 }
 
 void Engine::init() {	
@@ -17,6 +54,7 @@ void Engine::init() {
 	player->destructible = new PlayerDestructible(START_HP, 2, "your cadaver");
 	player->attacker = new Attacker(5);
 	player->ai = new PlayerAi();
+	player->behavior = getPlayerBehavior((PlayerAi*)player->ai);
 	player->container = new Container(26);
 	actors.push(player);
 

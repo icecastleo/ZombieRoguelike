@@ -160,6 +160,8 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Ai.h" />
     <ClInclude Include="Attacker.h" />
+    <ClInclude Include="BehaviorTree.h" />
+    <ClInclude Include="Constant.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="C_Vector.h" />
     <ClInclude Include="Describer.h" />
@@ -178,6 +180,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Ai.cpp" />
     <ClCompile Include="Attacker.cpp" />
+    <ClCompile Include="BehaviorTree.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="Describer.cpp" />
     <ClCompile Include="Destructible.cpp" />
