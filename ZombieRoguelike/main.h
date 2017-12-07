@@ -24,5 +24,7 @@ class Actor;
 #include "Engine.h"
 #include "Gui.h"
 
+#include "PlayerBehavior.h"
+
 //#define NDEBUG 
 #include <assert.h>

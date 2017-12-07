@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <utility>
+#include <algorithm>
 
 namespace bt1
 {
@@ -26,6 +28,7 @@ namespace bt1
 
 		virtual void onInitialize() {}
 		virtual void onTerminate(Status) {}
+		virtual float calculateUtility() { return 0.0f; };
 
 		Behavior()
 			: m_eStatus(BH_INVALID)
@@ -393,5 +396,50 @@ namespace bt1
 		}
 	};
 
+	typedef std::pair<Behavior *, float> PAIR;
+
+	class UtilitySelector : public Composite {
+	
+	protected:		
+		std::vector<PAIR> utility;
+
+		virtual Status update()
+		{
+			if (utility.size() == 0)
+			{
+				//Query for child utility values.
+				for (auto m_Current = m_Children.begin(); m_Current != m_Children.end(); m_Current++)
+				{
+					utility.push_back(std::make_pair(*m_Current, (*m_Current)->calculateUtility()));
+				}
+			}
+			
+			//Sort from highest utility to lowest.
+			sort(utility.begin(), utility.end(), [](const PAIR& lhs, const PAIR& rhs) {
+				return lhs.second > rhs.second;
+			});
+			
+			auto m_Current = utility.begin();
+			
+			//Evaluate in utility order and select the first valid child.
+			while (m_Current != utility.end())
+			{
+				Status s = (*m_Current).first->update();
+
+				if (s == BH_RUNNING) {
+					return BH_RUNNING;
+				}
+				else if (s == BH_SUCCESS)
+				{
+					utility.clear();
+					return BH_SUCCESS;
+				}
+				m_Current++;
+			}
+
+			utility.clear();
+			return BH_FAILURE;
+		}
+	};
 
 } // namespace bt1

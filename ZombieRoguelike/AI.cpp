@@ -136,14 +136,6 @@ void TeleportAi::update(Actor *owner) {
 //	}
 //}
 
-const int dir = 4; // number of possible directions to go at any position
-// if dir==4
-static int dxx[dir]={1, 0, -1, 0};
-static int dyy[dir]={0, 1, 0, -1};
-				   // if dir==8
-//static int dxx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
-//static int dyy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
-
 PlayerAi::PlayerAi() : xpLevel(1), dx(0), dy(0) {
 	con = new TCODConsole(engine.screenWidth, engine.screenHeight);
 }

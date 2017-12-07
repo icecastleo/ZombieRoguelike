@@ -13,38 +13,56 @@ screenWidth(screenWidth), screenHeight(screenHeight), m_level(1) {
 	registerObserver((EngineObserver *)gui);
 }
 
-class RandomMove : public Behavior {
-
-public:
-	RandomMove(Actor *actor)
-		:actor(actor) {}
-
-protected:
-	Actor *actor;
-
-	virtual Status update() {
-		//if (dx != 0 || dy != 0) {
-		//	engine.gameStatus = Engine::NEW_TURN;
-		//	
-		//	if (moveOrAttack(owner, owner->x + dx, owner->y + dy)) {
-		//		engine.map->computeFov();
-		//	}
-		//}
-
-
-	}
-};
-
 Behavior* Engine::getPlayerBehavior(PlayerAi *ai) {
 
 	Sequence *seq = new Sequence();
-	seq->addChild(new Wait(1000));
+	seq->addChild(new Wait(300));
 
-	seq->addChild(new SimpleAction([=]() {
-		ai->dx = 1;
-		ai->dy = 1;
+	Selector *actionSel = new Selector();
+	seq->addChild(actionSel);
+
+	Sequence *findStair = new Sequence();
+	actionSel->addChild(findStair);
+
+	// can the player see stair
+	findStair->addChild(new BoolCondition([=]() {
+		return this->map->isInFov(stairs->x, stairs->y);
 	}));
-	
+
+	findStair->addChild(new SimpleAction([=]() {
+		std::string path = map->pathFind(player->x, player->y, stairs->x, stairs->y);
+
+		if (path.length() == 0)
+			return BH_FAILURE;
+
+		char c = path.at(0);
+		int j = atoi(&c);
+
+		PlayerAi *ai = (PlayerAi*)player->ai;
+		ai->dx = dxx[j];
+		ai->dy = dyy[j];
+
+		/*if (stairs->x > player->x) {
+			ai->dx = 1;
+		}
+		else if (stairs->x < player->x) {
+			ai->dx = -1;
+		}
+		else if (stairs->y > player->y) {
+			ai->dy = 1;
+		}
+		else if (stairs->y < player->y) {
+			ai->dy = -1;
+		}*/
+	}));
+
+	UtilitySelector *sel = new UtilitySelector();
+	sel->addChild(new GetItemAction(&engine));
+	sel->addChild(new KillEnemyAction(&engine));
+	sel->addChild(new HeadToExitAction(&engine));
+
+	actionSel->addChild(sel);
+
 	return seq;
 }
 

@@ -14,15 +14,15 @@ static int closed_nodes_map[MAX_WIDTH][MAX_HEIGHT]; // map of closed (tried-out)
 static int open_nodes_map[MAX_WIDTH][MAX_HEIGHT]; // map of open (not-yet-tried) nodes
 static int dir_map[MAX_WIDTH][MAX_HEIGHT]; // map of directions
 
-const int dir = 4; // number of possible directions to go at any position
-
-// if dir==4
-static int dx[dir] = { 1, 0, -1, 0 };
-static int dy[dir] = { 0, 1, 0, -1 };
-
-// if dir==8
-//static int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
-//static int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+//const int dir = 4; // number of possible directions to go at any position
+//
+//// if dir==4
+//static int dx[dir] = { 1, 0, -1, 0 };
+//static int dy[dir] = { 0, 1, 0, -1 };
+//
+//// if dir==8
+////static int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+////static int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 
 class node {
 	// current position
@@ -52,7 +52,7 @@ public:
 	// give better priority to going strait instead of diagonally
 	// i: direction 
 	void nextLevel(const int & i) {
-		level += (dir == 8 ? (i % 2 == 0 ? 10 : 14) : 10);
+		level += (DIR == 8 ? (i % 2 == 0 ? 10 : 14) : 10);
 	}
 
 	// Estimation function for the remaining distance to the goal.
@@ -163,10 +163,10 @@ string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish
 			while (!(x == xStart && y == yStart))
 			{
 				j = dir_map[x][y];
-				c = '0' + (j + dir / 2) % dir;
+				c = '0' + (j + DIR / 2) % DIR;
 				path = c + path;
-				x += dx[j];
-				y += dy[j];
+				x += dxx[j];
+				y += dyy[j];
 			}
 
 			// garbage collection
@@ -183,16 +183,16 @@ string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish
 			{
 				c = path.at(i);
 				j = atoi(&c);
-				x = x + dx[j];
-				y = y + dy[j];
+				x = x + dxx[j];
+				y = y + dyy[j];
 				if (i == 0) {
-					printf("(%d, %d)", x, y);
+					//printf("(%d, %d)", x, y);
 				}
 				else if (i == path.length() - 1) {
-					printf("\n");
+					//printf("\n");
 				}
 				else {
-					printf(" -> (%d, %d)", x, y);
+					//printf(" -> (%d, %d)", x, y);
 				}
 			}
 
@@ -200,10 +200,10 @@ string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish
 		}
 
 		// generate moves (child nodes) in all possible directions
-		for (i = 0; i<dir; i++)
+		for (i = 0; i<DIR; i++)
 		{
-			xdx = x + dx[i];
-			ydy = y + dy[i];
+			xdx = x + dxx[i];
+			ydy = y + dyy[i];
 
 			if (canWalk(xdx, ydy) && closed_nodes_map[xdx][ydy] == 0)
 			{
@@ -219,14 +219,14 @@ string Map::pathFind(const int & xStart, const int & yStart, const int & xFinish
 					open_nodes_map[xdx][ydy] = m0->getPriority();
 					pq[pqi].push(*m0);
 					// mark its parent node direction
-					dir_map[xdx][ydy] = (i + dir / 2) % dir;
+					dir_map[xdx][ydy] = (i + DIR / 2) % DIR;
 				}
 				else if (open_nodes_map[xdx][ydy]>m0->getPriority())
 				{
 					// update the priority info
 					open_nodes_map[xdx][ydy] = m0->getPriority();
 					// update the parent direction info
-					dir_map[xdx][ydy] = (i + dir / 2) % dir;
+					dir_map[xdx][ydy] = (i + DIR / 2) % DIR;
 
 					// replace the node
 					// by emptying one pq to the other one
