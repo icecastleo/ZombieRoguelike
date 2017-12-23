@@ -1,6 +1,8 @@
 # ZombieRoguelike
 
-A roguelike dungeon game adapted from a tutorial at RogueBasin, containing a few C++ idioms, design patterns, behavior tree, and A*.​
+A roguelike dungeon game adapted from a tutorial at RogueBasin.
+
+It contains a few C++ idioms, design patterns, behavior tree, and A*.​
 
 https://www.youtube.com/edit?o=U&video_id=WkMBjBoxoLo
 
