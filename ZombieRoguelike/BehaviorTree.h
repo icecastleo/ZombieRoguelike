@@ -334,6 +334,7 @@ namespace bt1
 		}
 	};
 
+	// lambda condition
 	class BoolCondition : public Behavior 
 	{
 	public:
@@ -381,6 +382,7 @@ namespace bt1
 		}
 	};
 
+	// lambda action
 	class SimpleAction : public Behavior {
 	public:
 		SimpleAction(std::function<void()> action)
@@ -407,21 +409,21 @@ namespace bt1
 		{
 			if (utility.size() == 0)
 			{
-				//Query for child utility values.
+				//query for child utility values.
 				for (auto m_Current = m_Children.begin(); m_Current != m_Children.end(); m_Current++)
 				{
 					utility.push_back(std::make_pair(*m_Current, (*m_Current)->calculateUtility()));
 				}
 			}
 			
-			//Sort from highest utility to lowest.
+			//sort from highest utility to lowest.
 			sort(utility.begin(), utility.end(), [](const PAIR& lhs, const PAIR& rhs) {
 				return lhs.second > rhs.second;
 			});
 			
 			auto m_Current = utility.begin();
 			
-			//Evaluate in utility order and select the first valid child.
+			//evaluate in utility order and select the first valid child.
 			while (m_Current != utility.end())
 			{
 				Status s = (*m_Current).first->update();

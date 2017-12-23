@@ -16,6 +16,7 @@ screenWidth(screenWidth), screenHeight(screenHeight), m_level(1) {
 Behavior* Engine::getPlayerBehavior(PlayerAi *ai) {
 
 	Sequence *seq = new Sequence();
+	// wait for a second every time
 	seq->addChild(new Wait(300));
 
 	Selector *actionSel = new Selector();
@@ -29,6 +30,7 @@ Behavior* Engine::getPlayerBehavior(PlayerAi *ai) {
 		return this->map->isInFov(stairs->x, stairs->y);
 	}));
 
+	// head to stair (exit)
 	findStair->addChild(new SimpleAction([=]() {
 		std::string path = map->pathFind(player->x, player->y, stairs->x, stairs->y);
 
@@ -41,24 +43,15 @@ Behavior* Engine::getPlayerBehavior(PlayerAi *ai) {
 		PlayerAi *ai = (PlayerAi*)player->ai;
 		ai->dx = dxx[j];
 		ai->dy = dyy[j];
-
-		/*if (stairs->x > player->x) {
-			ai->dx = 1;
-		}
-		else if (stairs->x < player->x) {
-			ai->dx = -1;
-		}
-		else if (stairs->y > player->y) {
-			ai->dy = 1;
-		}
-		else if (stairs->y < player->y) {
-			ai->dy = -1;
-		}*/
 	}));
 
+	// Utility decition
 	UtilitySelector *sel = new UtilitySelector();
+	// get item
 	sel->addChild(new GetItemAction(&engine));
+	// kill enemy
 	sel->addChild(new KillEnemyAction(&engine));
+	// explore (For simplicity, a* to the stair directly)
 	sel->addChild(new HeadToExitAction(&engine));
 
 	actionSel->addChild(sel);
