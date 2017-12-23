@@ -133,6 +133,12 @@ namespace bt1
 	class Composite : public Behavior
 	{
 	public:
+		virtual ~Composite() {
+			for (Behavior *beh : m_Children) {
+				delete beh;
+			}
+		}
+
 		void addChild(Behavior* child) { m_Children.push_back(child); }
 		void removeChild(Behavior*);
 		void clearChildren();

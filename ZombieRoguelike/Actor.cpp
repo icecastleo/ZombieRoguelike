@@ -61,7 +61,6 @@ Actor::~Actor() {
 	if (attacker) delete attacker;
 	if (destructible) delete destructible;
 	if (ai) delete ai;
-	if (behavior) delete behavior;
 	if (pickable) delete pickable;
 	if (usable) delete usable;
 	if (container) delete container;
@@ -97,9 +96,6 @@ void Actor::setColor(TCODColor col) {
 }
 
 void Actor::update() {
-	if (behavior)
-		behavior->tick();
-
 	if (ai) 
 		ai->update(this);
 }

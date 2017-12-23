@@ -48,11 +48,15 @@ protected:
 
 class PlayerAi : public Ai {
 public:
-	int dx, dy;
-
 	int xpLevel;
+	int dx, dy;
+	bt1::Behavior *behavior;
+	
 	PlayerAi();
+	~PlayerAi();
+
 	Ai* copy() override;
+	bt1::Behavior * getPlayerBehavior();
 	int getNextLevelXp();
 	void update(Actor *owner) override;
 	void load(TCODZip &zip);
@@ -61,13 +65,10 @@ public:
 	std::string path;
 	void render(const Actor *owner) const;
 
-	bt1::Behavior *behavior;
-
 protected:
 	bool moveOrAttack(Actor *owner, int targetx, int targety);
 	void handleActionKey(Actor *owner, int ascii);
 	Actor *choseFromInventory(Actor *owner);
-	void checkExperience(Actor *owner);
+	void checkLevelUp(Actor *owner);
 	TCODConsole *con;
-
 };

@@ -138,10 +138,61 @@ void TeleportAi::update(Actor *owner) {
 
 PlayerAi::PlayerAi() : xpLevel(1), dx(0), dy(0) {
 	con = new TCODConsole(engine.screenWidth, engine.screenHeight);
+	behavior = getPlayerBehavior();
+}
+
+PlayerAi::~PlayerAi()
+{
+	delete behavior;
 }
 
 Ai* PlayerAi::copy() {
 	return new PlayerAi(*this);
+}
+
+Behavior* PlayerAi::getPlayerBehavior() {
+
+	Sequence *seq = new Sequence();
+	// wait for a second every time
+	seq->addChild(new Wait(300));
+
+	Selector *actionSel = new Selector();
+	seq->addChild(actionSel);
+
+	Sequence *findStair = new Sequence();
+	actionSel->addChild(findStair);
+
+	// can the player see stair
+	findStair->addChild(new BoolCondition([=]() {
+		return engine.map->isInFov(engine.stairs->x, engine.stairs->y);
+	}));
+
+	// head to stair (exit)
+	findStair->addChild(new SimpleAction([=]() {
+		std::string path = engine.map->pathFind(engine.player->x, engine.player->y, engine.stairs->x, engine.stairs->y);
+
+		if (path.length() == 0)
+			return BH_FAILURE;
+
+		char c = path.at(0);
+		int j = atoi(&c);
+
+		dx = dxx[j];
+		dy = dyy[j];
+	}));
+
+	// utility decition
+	UtilitySelector *sel = new UtilitySelector();
+	// get item
+	sel->addChild(new GetItemAction(&engine));
+	// kill enemy
+	sel->addChild(new KillEnemyAction(&engine));
+	// explore (for simplicity, a* to the stair directly)
+	sel->addChild(new HeadToExitAction(&engine));
+
+	actionSel->addChild(sel);
+
+	return seq;
 }
 
 int PlayerAi::getNextLevelXp() {
@@ -154,9 +205,11 @@ void PlayerAi::update(Actor *owner) {
 		return;
 	}
 
-	checkExperience(owner);
+	checkLevelUp(owner);
 
 	//int dx = 0, dy = 0;
+
+	behavior->tick();
 
 	if (engine.mouse.rbutton_pressed) {
 		if (engine.map->isExplored(engine.mouse.cx, engine.mouse.cy)) {
@@ -221,7 +274,7 @@ void PlayerAi::update(Actor *owner) {
 	}
 }
 
-void PlayerAi::checkExperience(Actor *owner) {
+void PlayerAi::checkLevelUp(Actor *owner) {
 	int levelUpXp = getNextLevelXp();
 
 	if (owner->destructible->xp >= levelUpXp) {
@@ -230,7 +283,7 @@ void PlayerAi::checkExperience(Actor *owner) {
 		owner->destructible->heal();
 		engine.gui->message(TCODColor::yellow, "You reached level %d! \nYou feel healthy and your battle skills grow stronger!", xpLevel);
 
-		engine.gui->menu.clear();
+		/*engine.gui->menu.clear();
 		engine.gui->menu.addItem(Menu::CONSTITUTION, "Constitution (+20HP)");
 		engine.gui->menu.addItem(Menu::STRENGTH, "Strength (+1 attack)");
 		engine.gui->menu.addItem(Menu::AGILITY, "Agility (+1 defense)");
@@ -248,7 +301,10 @@ void PlayerAi::checkExperience(Actor *owner) {
 			owner->destructible->defense += 1;
 			break;
 		default:break;
-		}
+		}*/
+
+		owner->destructible->maxHp += 20;
+		owner->destructible->hp += 20;
 	}
 }
 
